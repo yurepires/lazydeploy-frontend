@@ -1,0 +1,13 @@
+<section class="placeholder glass-panel" aria-labelledby="placeholder-title">
+  <div class="placeholder__icon" aria-hidden="true">
+    <mat-icon>{{ icon() }}</mat-icon>
+  </div>
+  <p class="eyebrow">{{ eyebrow() }}</p>
+  <h1 id="placeholder-title">{{ title() }}</h1>
+  <p class="placeholder__description">{{ description() }}</p>
+  @if (actionLabel() && actionRoute()) {
+    <a class="placeholder__action" matButton="filled" [routerLink]="actionRoute()">
+      {{ actionLabel() }}
+    </a>
+  }
+</section>

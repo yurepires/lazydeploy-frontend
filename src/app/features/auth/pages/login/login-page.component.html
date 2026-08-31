@@ -1,0 +1,28 @@
+<main class="auth-page">
+  <div class="auth-page__glow auth-page__glow--top" aria-hidden="true"></div>
+  <div class="auth-page__glow auth-page__glow--bottom" aria-hidden="true"></div>
+
+  <section class="auth-card glass-dialog" aria-labelledby="login-title">
+    <app-brand-mark />
+    <p class="eyebrow">Área restrita</p>
+    <h1 id="login-title">Bem-vindo de volta</h1>
+    <p class="auth-card__description">
+      Entre para acompanhar seus alertas de servidores Battlefield em um só lugar.
+    </p>
+
+    <div class="form-preview" aria-label="Formulário de login em preparação">
+      <div class="form-preview__line"><mat-icon>mail</mat-icon><span>Seu e-mail</span></div>
+      <div class="form-preview__line"><mat-icon>lock</mat-icon><span>Sua senha</span></div>
+      <span class="form-preview__badge">Autenticação na próxima fase</span>
+    </div>
+
+    <a class="auth-card__primary-action" matButton="filled" routerLink="/dashboard">
+      <mat-icon>visibility</mat-icon>
+      Ver demonstração
+    </a>
+    <p class="auth-card__footer">
+      Ainda não possui acesso?
+      <a routerLink="/register">Criar uma conta</a>
+    </p>
+  </section>
+</main>

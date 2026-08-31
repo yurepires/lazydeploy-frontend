@@ -1,0 +1,77 @@
+<div class="app-shell">
+  <mat-toolbar class="topbar glass-panel">
+    <button
+      class="topbar__menu"
+      matIconButton
+      type="button"
+      aria-label="Abrir navegação"
+      (click)="toggleNavigation()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <app-brand-mark />
+
+    <span class="topbar__spacer"></span>
+
+    <span class="topbar__status" aria-label="Status da plataforma">
+      <span class="topbar__status-dot" aria-hidden="true"></span>
+      Plataforma online
+    </span>
+    <button class="topbar__account" matIconButton type="button" aria-label="Conta">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="shell-content">
+    <mat-sidenav
+      class="navigation glass-panel"
+      [mode]="sidenavMode()"
+      [opened]="isMobile() ? sidenavOpened() : true"
+      (backdropClick)="closeNavigationOnMobile()"
+    >
+      <div class="navigation__heading">
+        <span class="eyebrow">Workspace</span>
+        <span class="navigation__caption">Monitoramento</span>
+      </div>
+
+      <nav class="navigation__links" aria-label="Navegação principal">
+        <a
+          class="navigation__link"
+          routerLink="/dashboard"
+          routerLinkActive="navigation__link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeNavigationOnMobile()"
+        >
+          <mat-icon>space_dashboard</mat-icon>
+          <span>Dashboard</span>
+        </a>
+        <a
+          class="navigation__link"
+          routerLink="/history"
+          routerLinkActive="navigation__link--active"
+          (click)="closeNavigationOnMobile()"
+        >
+          <mat-icon>history</mat-icon>
+          <span>Histórico</span>
+        </a>
+      </nav>
+
+      <div class="navigation__footer">
+        <div class="navigation__footer-icon" aria-hidden="true">
+          <mat-icon>shield</mat-icon>
+        </div>
+        <div>
+          <strong>LazyDeploy</strong>
+          <span>Ambiente seguro</span>
+        </div>
+      </div>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="shell-main">
+      <main class="shell-main__inner">
+        <router-outlet />
+      </main>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

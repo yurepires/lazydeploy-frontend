@@ -1,0 +1,6 @@
+<div class="brand-mark" [class.compact]="compact()" aria-label="LazyDeploy">
+  <span class="brand-mark__symbol" aria-hidden="true">LD</span>
+  @if (!compact()) {
+    <span class="brand-mark__name">Lazy<span>Deploy</span></span>
+  }
+</div>

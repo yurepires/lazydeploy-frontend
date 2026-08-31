@@ -1,0 +1,47 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.placeholder {
+  display: flex;
+  min-height: 21rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2rem, 5vw, 4rem);
+  text-align: center;
+}
+
+.placeholder__icon {
+  display: grid;
+  width: 3.7rem;
+  height: 3.7rem;
+  margin-bottom: var(--space-lg);
+  place-items: center;
+  border: 1px solid rgba(110, 231, 211, 0.23);
+  border-radius: 1.2rem;
+  background: rgba(110, 231, 211, 0.09);
+  color: var(--color-accent);
+}
+
+.placeholder__icon mat-icon {
+  font-size: 1.85rem;
+}
+
+.placeholder h1 {
+  margin: var(--space-sm) 0 var(--space-sm);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: -0.04em;
+}
+
+.placeholder__description {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.placeholder__action {
+  margin-top: var(--space-lg);
+}

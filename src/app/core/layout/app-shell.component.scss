@@ -1,0 +1,225 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.app-shell {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 75% 5%, rgba(100, 117, 220, 0.16), transparent 28rem),
+    radial-gradient(circle at 15% 85%, rgba(57, 175, 161, 0.1), transparent 31rem),
+    var(--color-background);
+}
+
+.app-shell::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(115deg, rgba(4, 8, 14, 0.78), rgba(4, 8, 14, 0.52));
+  content: '';
+  pointer-events: none;
+}
+
+.app-shell::after {
+  position: absolute;
+  inset: -0.75rem;
+  z-index: 0;
+  background-image: var(--background-image, none);
+  background-position: center;
+  background-size: cover;
+  content: '';
+  filter: blur(7px);
+  opacity: 0.56;
+  transform: scale(1.02);
+  pointer-events: none;
+}
+
+.topbar,
+.shell-content {
+  position: relative;
+  z-index: 1;
+}
+
+.topbar {
+  display: flex;
+  width: calc(100% - 2rem);
+  min-height: 4.5rem;
+  margin: var(--space-md) auto 0;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-lg);
+}
+
+.topbar__menu {
+  display: none;
+  margin-right: var(--space-sm);
+}
+
+.topbar__spacer {
+  flex: 1;
+}
+
+.topbar__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: var(--space-sm);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.topbar__status-dot {
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0.8rem rgba(110, 231, 211, 0.8);
+}
+
+.topbar__account {
+  color: var(--text-secondary);
+}
+
+.shell-content {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  margin: var(--space-md);
+  background: transparent;
+}
+
+.navigation {
+  width: 16.5rem;
+  padding: var(--space-lg) var(--space-sm);
+  border-radius: var(--radius-lg);
+}
+
+.navigation__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0 var(--space-sm) var(--space-lg);
+}
+
+.navigation__caption {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.navigation__links {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.navigation__link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3rem;
+  padding: 0 var(--space-sm);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: 160ms ease;
+}
+
+.navigation__link mat-icon {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+
+.navigation__link:hover,
+.navigation__link--active {
+  border-color: rgba(110, 231, 211, 0.16);
+  background: rgba(110, 231, 211, 0.1);
+  color: var(--text-primary);
+}
+
+.navigation__link--active mat-icon {
+  color: var(--color-accent);
+}
+
+.navigation__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: auto var(--space-sm) 0;
+  padding-top: var(--space-lg);
+  color: var(--text-secondary);
+}
+
+.navigation__footer-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: rgba(142, 165, 255, 0.12);
+  color: var(--color-primary);
+}
+
+.navigation__footer-icon mat-icon {
+  font-size: 1rem;
+}
+
+.navigation__footer strong,
+.navigation__footer span {
+  display: block;
+}
+
+.navigation__footer strong {
+  color: var(--text-primary);
+  font-size: 0.75rem;
+}
+
+.navigation__footer span {
+  margin-top: 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.shell-main {
+  min-width: 0;
+  flex: 1;
+  background: transparent;
+}
+
+.shell-main__inner {
+  width: min(100%, var(--content-max-width));
+  min-height: 100%;
+  margin: 0 auto;
+  padding: var(--space-md) var(--space-lg) var(--space-xl);
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    width: calc(100% - 1rem);
+    margin-top: var(--space-sm);
+  }
+
+  .topbar__menu {
+    display: inline-flex;
+  }
+
+  .topbar__status {
+    display: none;
+  }
+
+  .shell-content {
+    margin: var(--space-sm);
+  }
+
+  .navigation {
+    width: min(82vw, 17rem);
+  }
+
+  .shell-main__inner {
+    padding: var(--space-sm) 0 var(--space-lg);
+  }
+}

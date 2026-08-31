@@ -1,0 +1,29 @@
+<main class="auth-page">
+  <div class="auth-page__glow auth-page__glow--top" aria-hidden="true"></div>
+  <div class="auth-page__glow auth-page__glow--bottom" aria-hidden="true"></div>
+
+  <section class="auth-card glass-dialog" aria-labelledby="register-title">
+    <app-brand-mark />
+    <p class="eyebrow">Comece agora</p>
+    <h1 id="register-title">Crie seu workspace</h1>
+    <p class="auth-card__description">
+      Configure alertas inteligentes e saiba quando seus servidores estiverem prontos para jogar.
+    </p>
+
+    <div class="form-preview" aria-label="Formulário de cadastro em preparação">
+      <div class="form-preview__line"><mat-icon>person</mat-icon><span>Seu nome</span></div>
+      <div class="form-preview__line"><mat-icon>mail</mat-icon><span>Seu e-mail</span></div>
+      <div class="form-preview__line"><mat-icon>lock</mat-icon><span>Crie uma senha</span></div>
+      <span class="form-preview__badge">Cadastro na próxima fase</span>
+    </div>
+
+    <a class="auth-card__primary-action" matButton="filled" routerLink="/dashboard">
+      <mat-icon>rocket_launch</mat-icon>
+      Explorar a plataforma
+    </a>
+    <p class="auth-card__footer">
+      Já possui uma conta?
+      <a routerLink="/login">Fazer login</a>
+    </p>
+  </section>
+</main>
