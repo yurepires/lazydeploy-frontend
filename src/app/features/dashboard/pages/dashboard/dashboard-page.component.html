@@ -1,15 +1,13 @@
 <section class="dashboard-page" aria-labelledby="dashboard-title">
   <header class="dashboard-page__header">
     <div>
-      <p class="eyebrow">Visão geral</p>
-      <h1 id="dashboard-title">Meus alertas</h1>
-      <p class="dashboard-page__subtitle">
-        Acompanhe seus servidores e receba sinais no momento certo.
-      </p>
+      <p class="eyebrow">Meus alertas</p>
+      <h1 id="dashboard-title">Dashboard</h1>
+      <p class="dashboard-page__subtitle">Acompanhe e gerencie seus alertas do Battlefield 4.</p>
     </div>
     <a class="dashboard-page__action" matButton="filled" routerLink="/alerts/new">
       <mat-icon>add</mat-icon>
-      Adicionar alerta
+      Criar alerta
     </a>
   </header>
 
@@ -17,40 +15,99 @@
     <article class="metric-card glass-card">
       <span class="metric-card__icon"><mat-icon>notifications_active</mat-icon></span>
       <span class="metric-card__label">Alertas ativos</span>
-      <strong class="metric-card__value">—</strong>
-      <span class="metric-card__hint">Aguardando configuração</span>
+      <strong class="metric-card__value">{{ activeSubscriptionCount() }}</strong>
+      <span class="metric-card__hint">De {{ subscriptions().length }} configurados</span>
     </article>
     <article class="metric-card glass-card">
       <span class="metric-card__icon metric-card__icon--cyan"><mat-icon>dns</mat-icon></span>
       <span class="metric-card__label">Servidores monitorados</span>
-      <strong class="metric-card__value">—</strong>
-      <span class="metric-card__hint">Nenhum servidor conectado</span>
+      <strong class="metric-card__value">{{ monitoredServerCount() }}</strong>
+      <span class="metric-card__hint">Em seus alertas</span>
     </article>
     <article class="metric-card glass-card">
-      <span class="metric-card__icon metric-card__icon--amber"><mat-icon>trending_up</mat-icon></span>
-      <span class="metric-card__label">Eventos recentes</span>
-      <strong class="metric-card__value">—</strong>
-      <span class="metric-card__hint">Seu histórico aparecerá aqui</span>
+      <span class="metric-card__icon metric-card__icon--amber"><mat-icon>send</mat-icon></span>
+      <span class="metric-card__label">Canais ativos</span>
+      <strong class="metric-card__value">{{ activeChannelCount() }}</strong>
+      <span class="metric-card__hint">Prontos para notificar</span>
     </article>
   </div>
 
-  <section class="empty-state glass-panel" aria-labelledby="empty-state-title">
-    <div class="empty-state__visual" aria-hidden="true">
-      <mat-icon>radar</mat-icon>
-      <span class="empty-state__ring empty-state__ring--one"></span>
-      <span class="empty-state__ring empty-state__ring--two"></span>
-    </div>
-    <div class="empty-state__content">
-      <p class="eyebrow">Tudo pronto para começar</p>
-      <h2 id="empty-state-title">Nenhum alerta configurado</h2>
-      <p>
-        Crie seu primeiro alerta para acompanhar um servidor, definir as regras e receber uma
-        notificação quando as condições forem atendidas.
-      </p>
-      <a matButton="filled" routerLink="/alerts/new">
-        <mat-icon>add</mat-icon>
-        Criar primeiro alerta
-      </a>
-    </div>
-  </section>
+  @if (loading()) {
+    <section class="dashboard-state" aria-busy="true" aria-label="Carregando alertas">
+      <span class="sr-only">Carregando seus alertas...</span>
+      <div class="alert-grid alert-grid--loading">
+        @for (placeholder of loadingPlaceholders; track placeholder) {
+          <article class="alert-skeleton glass-card" aria-hidden="true">
+            <span class="alert-skeleton__line alert-skeleton__line--heading"></span>
+            <span class="alert-skeleton__line"></span>
+            <span class="alert-skeleton__line alert-skeleton__line--short"></span>
+            <span class="alert-skeleton__block"></span>
+            <span class="alert-skeleton__block alert-skeleton__block--small"></span>
+          </article>
+        }
+      </div>
+    </section>
+  } @else {
+    @if (loadError(); as errorMessage) {
+      <section class="dashboard-feedback dashboard-feedback--error glass-panel" role="alert">
+        <div class="dashboard-feedback__icon" aria-hidden="true">
+          <mat-icon>cloud_off</mat-icon>
+        </div>
+        <div>
+          <h2>Não foi possível carregar seus alertas</h2>
+          <p>{{ errorMessage }}</p>
+          <button matButton="filled" type="button" (click)="loadSubscriptions()">
+            <mat-icon>refresh</mat-icon>
+            Tentar novamente
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (isEmpty()) {
+      <section class="empty-state glass-panel" aria-labelledby="empty-state-title">
+        <div class="empty-state__visual" aria-hidden="true">
+          <mat-icon>radar</mat-icon>
+          <span class="empty-state__ring empty-state__ring--one"></span>
+          <span class="empty-state__ring empty-state__ring--two"></span>
+        </div>
+        <div class="empty-state__content">
+          <p class="eyebrow">Tudo pronto para começar</p>
+          <h2 id="empty-state-title">Nenhum alerta configurado</h2>
+          <p>Adicione um servidor e escolha quando o LazyDeploy deve avisar você.</p>
+          <a matButton="filled" routerLink="/alerts/new">
+            <mat-icon>add</mat-icon>
+            Criar primeiro alerta
+          </a>
+        </div>
+      </section>
+    }
+
+    @if (hasSubscriptions()) {
+      <section class="dashboard-alerts" aria-labelledby="alerts-title">
+        <div class="dashboard-alerts__heading">
+          <div>
+            <p class="eyebrow">Configurações</p>
+            <h2 id="alerts-title">Seus alertas</h2>
+          </div>
+          <span class="dashboard-alerts__count" aria-live="polite">
+            {{ subscriptions().length }}
+            {{ alertCountLabel() }}
+          </span>
+        </div>
+
+        <div class="alert-grid">
+          @for (subscription of subscriptions(); track subscription.id) {
+            <app-alert-card
+              [subscription]="subscription"
+              [updating]="isUpdating(subscription.id)"
+              [deleting]="isDeleting(subscription.id)"
+              (toggleEnabled)="toggleSubscription(subscription)"
+              (deleteRequested)="requestDelete(subscription)"
+            />
+          }
+        </div>
+      </section>
+    }
+  }
 </section>

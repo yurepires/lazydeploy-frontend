@@ -21,6 +21,14 @@ export class ApiClientService {
     return this.http.post<TResponse>(this.buildUrl(resourcePath), body);
   }
 
+  patch<TResponse, TRequest>(resourcePath: string, body: TRequest): Observable<TResponse> {
+    return this.http.patch<TResponse>(this.buildUrl(resourcePath), body);
+  }
+
+  delete<TResponse>(resourcePath: string): Observable<TResponse> {
+    return this.http.delete<TResponse>(this.buildUrl(resourcePath));
+  }
+
   private buildUrl(resourcePath: string): string {
     const baseUrl = this.apiConfig.baseUrl.replace(/\/$/, '');
     const apiPath = this.apiConfig.apiPath.replace(/^\/?/, '/').replace(/\/$/, '');

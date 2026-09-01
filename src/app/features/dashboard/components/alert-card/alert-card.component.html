@@ -1,0 +1,110 @@
+<article
+  class="alert-card glass-card"
+  [class.alert-card--disabled]="!subscription().enabled"
+  [attr.aria-busy]="isBusy()"
+>
+  <header class="alert-card__header">
+    <div class="alert-card__identity">
+      <span class="alert-card__server-icon" aria-hidden="true">
+        <mat-icon>dns</mat-icon>
+      </span>
+      <div>
+        <p class="eyebrow">Servidor monitorado</p>
+        <h2>{{ subscription().server.displayName }}</h2>
+        <p class="alert-card__guid">GUID {{ subscription().server.guid }}</p>
+      </div>
+    </div>
+
+    <span
+      class="alert-card__status"
+      [class.alert-card__status--disabled]="!subscription().enabled"
+      [attr.aria-label]="'Status do alerta: ' + statusLabel()"
+    >
+      <mat-icon aria-hidden="true">{{ statusIcon() }}</mat-icon>
+      {{ statusLabel() }}
+    </span>
+  </header>
+
+  <div class="alert-card__content">
+    <section class="alert-card__section" aria-labelledby="rules-title-{{ subscription().id }}">
+      <div class="alert-card__section-heading">
+        <mat-icon aria-hidden="true">tune</mat-icon>
+        <h3 id="rules-title-{{ subscription().id }}">Regras do alerta</h3>
+      </div>
+
+      @if (presentedRules().length > 0) {
+        <ul class="alert-card__list">
+          @for (rule of presentedRules(); track $index) {
+            <li>
+              <mat-icon aria-hidden="true">{{ rule.icon }}</mat-icon>
+              <span>
+                <strong>{{ rule.label }}</strong>
+                <small>{{ rule.description }}</small>
+              </span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="alert-card__empty-detail">Nenhuma regra ativa.</p>
+      }
+    </section>
+
+    <section class="alert-card__section" aria-labelledby="channels-title-{{ subscription().id }}">
+      <div class="alert-card__section-heading">
+        <mat-icon aria-hidden="true">send</mat-icon>
+        <h3 id="channels-title-{{ subscription().id }}">Canais ativos</h3>
+      </div>
+
+      @if (presentedChannels().length > 0) {
+        <ul class="alert-card__list">
+          @for (channel of presentedChannels(); track $index) {
+            <li>
+              <mat-icon aria-hidden="true">{{ channel.icon }}</mat-icon>
+              <span>
+                <strong>{{ channel.label }}</strong>
+                <small>{{ channel.description }}</small>
+              </span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="alert-card__empty-detail">Nenhum canal ativo.</p>
+      }
+    </section>
+  </div>
+
+  <footer class="alert-card__footer">
+    <a matButton="text" [routerLink]="['/alerts', subscription().id]">Ver detalhes</a>
+    <a matButton="text" [routerLink]="['/alerts', subscription().id, 'edit']">Editar</a>
+    <span class="alert-card__footer-spacer"></span>
+    <button
+      matIconButton
+      type="button"
+      [attr.aria-label]="toggleActionLabel()"
+      [disabled]="isBusy()"
+      (click)="emitToggle()"
+    >
+      @if (updating()) {
+        <mat-icon>sync</mat-icon>
+      } @else if (subscription().enabled) {
+        <mat-icon>pause_circle</mat-icon>
+      } @else {
+        <mat-icon>play_circle</mat-icon>
+      }
+    </button>
+    <button
+      matIconButton
+      class="alert-card__delete"
+      type="button"
+      aria-label="Remover alerta"
+      [disabled]="isBusy()"
+      (click)="emitDelete()"
+    >
+      @if (deleting()) {
+        <mat-icon>sync</mat-icon>
+      } @else {
+        <mat-icon>delete_outline</mat-icon>
+      }
+    </button>
+  </footer>
+</article>

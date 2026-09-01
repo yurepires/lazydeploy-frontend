@@ -1,0 +1,232 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.alert-card {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+.alert-card:hover {
+  border-color: var(--color-border-strong);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 34%),
+    linear-gradient(145deg, rgba(24, 38, 58, 0.58), rgba(12, 21, 34, 0.34));
+  transform: translateY(-2px);
+}
+
+.alert-card--disabled {
+  opacity: 0.8;
+}
+
+.alert-card__header,
+.alert-card__identity,
+.alert-card__footer,
+.alert-card__section-heading,
+.alert-card__list li {
+  display: flex;
+  align-items: center;
+}
+
+.alert-card__header {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.alert-card__identity {
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.alert-card__server-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid rgba(110, 231, 211, 0.22);
+  border-radius: var(--radius-md);
+  background: rgba(110, 231, 211, 0.1);
+  color: var(--color-accent);
+}
+
+.alert-card__server-icon mat-icon {
+  font-size: 1.3rem;
+}
+
+.alert-card .eyebrow {
+  margin: 0 0 0.3rem;
+  font-size: 0.65rem;
+}
+
+.alert-card h2 {
+  max-width: 22rem;
+  margin: 0;
+  overflow: hidden;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alert-card__guid {
+  max-width: 22rem;
+  margin: 0.35rem 0 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alert-card__status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid rgba(110, 231, 211, 0.24);
+  border-radius: 999px;
+  background: rgba(110, 231, 211, 0.1);
+  color: var(--color-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.alert-card__status--disabled {
+  border-color: var(--color-border);
+  background: rgba(126, 139, 158, 0.12);
+  color: var(--text-secondary);
+}
+
+.alert-card__status mat-icon {
+  font-size: 1rem;
+}
+
+.alert-card__content {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.alert-card__section {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.alert-card__section-heading {
+  gap: 0.45rem;
+}
+
+.alert-card__section-heading mat-icon {
+  color: var(--color-primary);
+  font-size: 1.05rem;
+}
+
+.alert-card h3 {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.alert-card__list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alert-card__list li {
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+
+.alert-card__list li > mat-icon {
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
+  color: var(--color-accent);
+  font-size: 1rem;
+}
+
+.alert-card__list span {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.alert-card__list strong {
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.alert-card__list small,
+.alert-card__empty-detail {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.alert-card__empty-detail {
+  margin: 0.8rem 0 0;
+}
+
+.alert-card__footer {
+  gap: 0.2rem;
+  margin-top: auto;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.alert-card__footer a {
+  min-height: 2.25rem;
+  padding-inline: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+}
+
+.alert-card__footer a:hover {
+  color: var(--text-primary);
+}
+
+.alert-card__footer-spacer {
+  flex: 1;
+}
+
+.alert-card__footer button {
+  color: var(--text-secondary);
+}
+
+.alert-card__footer button:hover {
+  color: var(--color-primary);
+}
+
+.alert-card__footer .alert-card__delete:hover {
+  color: var(--color-danger);
+}
+
+@media (max-width: 520px) {
+  .alert-card__header {
+    flex-direction: column;
+  }
+
+  .alert-card__status {
+    align-self: flex-start;
+  }
+
+  .alert-card__footer {
+    flex-wrap: wrap;
+  }
+}
