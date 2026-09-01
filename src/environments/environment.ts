@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:8080',
+  // Requests use the Angular dev-server proxy, keeping session cookies same-origin.
+  apiBaseUrl: '',
   apiPath: '/api',
 } as const;

@@ -1,13 +1,22 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
+import { API_CONFIG } from '../config/api-config';
 import { AppShellComponent } from './app-shell.component';
 
 describe('AppShellComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppShellComponent],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        {
+          provide: API_CONFIG,
+          useValue: { baseUrl: 'http://localhost:8080', apiPath: '/api' },
+        },
+      ],
     }).compileComponents();
   });
 

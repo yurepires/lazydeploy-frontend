@@ -1,10 +1,26 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
+
+import { AuthService } from './core/auth/auth.service';
 import { App } from './app.component';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
+      providers: [
+        provideRouter([]),
+        {
+          provide: AuthService,
+          useValue: {
+            initialized: signal(true),
+            loading: signal(false),
+            loadCurrentUser: () => of(null),
+          },
+        },
+      ],
     }).compileComponents();
   });
 

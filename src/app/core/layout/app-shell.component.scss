@@ -79,7 +79,29 @@
   box-shadow: 0 0 0.8rem rgba(110, 231, 211, 0.8);
 }
 
-.topbar__account {
+.topbar__account-info {
+  display: inline-flex;
+  max-width: min(32vw, 18rem);
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: var(--space-sm);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+}
+
+.topbar__account-info mat-icon {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+}
+
+.topbar__account-info span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar__logout {
+  margin-left: 0.2rem;
   color: var(--text-secondary);
 }
 
@@ -208,6 +230,14 @@
   }
 
   .topbar__status {
+    display: none;
+  }
+
+  .topbar__account-info {
+    max-width: 2rem;
+  }
+
+  .topbar__account-info span {
     display: none;
   }
 

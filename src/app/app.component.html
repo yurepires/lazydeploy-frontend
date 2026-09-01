@@ -1,1 +1,8 @@
+@if (!authService.initialized()) {
+  <div class="app-loading" role="status" aria-live="polite">
+    <div class="app-loading__spinner" aria-hidden="true"></div>
+    <span>Verificando sua sessão...</span>
+  </div>
+}
+
 <router-outlet />

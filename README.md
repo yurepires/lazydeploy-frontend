@@ -27,8 +27,11 @@ npm test -- --watch=false
 - `src/assets`: imagens e branding substituíveis sem alterar componentes.
 - `src/environments`: URLs por ambiente.
 
-As telas atuais são placeholders visuais. Autenticação, integração com o backend,
-CSRF e dados reais serão adicionados na próxima fase.
+O frontend já possui autenticação por sessão integrada ao backend: login, cadastro,
+logout, guards, restauração do usuário atual, cookies de sessão, CSRF e mensagens
+amigáveis para erros `ProblemDetail`. Em desenvolvimento, as chamadas `/api` são
+encaminhadas pelo proxy para `http://localhost:8080`, preservando os cookies como
+se fossem requisições da mesma origem.
 
 O background temático atual está em `src/assets/images/backgrounds/bf4-background.jpg`.
 Para substituí-lo, troque esse arquivo mantendo o mesmo nome ou atualize o token

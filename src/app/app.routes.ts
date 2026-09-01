@@ -1,15 +1,20 @@
 import { Routes } from '@angular/router';
 
 import { AppShellComponent } from './core/layout/app-shell.component';
+import { authGuard, rootRedirectGuard } from './core/guards/auth.guard';
+import { guestGuard as guestRouteGuard } from './core/guards/guest.guard';
+import { RootRedirectComponent } from './core/routing/root-redirect.component';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'dashboard',
+    component: RootRedirectComponent,
+    canActivate: [rootRedirectGuard],
   },
   {
     path: 'login',
+    canActivate: [guestRouteGuard],
     loadComponent: () =>
       import('./features/auth/pages/login/login-page.component').then(
         ({ LoginPageComponent }) => LoginPageComponent,
@@ -17,6 +22,7 @@ export const routes: Routes = [
   },
   {
     path: 'register',
+    canActivate: [guestRouteGuard],
     loadComponent: () =>
       import('./features/auth/pages/register/register-page.component').then(
         ({ RegisterPageComponent }) => RegisterPageComponent,
@@ -28,6 +34,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/dashboard/pages/dashboard/dashboard-page.component').then(
             ({ DashboardPageComponent }) => DashboardPageComponent,
@@ -35,6 +42,7 @@ export const routes: Routes = [
       },
       {
         path: 'alerts/new',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/alerts/pages/create-alert/create-alert-page.component').then(
             ({ CreateAlertPageComponent }) => CreateAlertPageComponent,
@@ -42,6 +50,7 @@ export const routes: Routes = [
       },
       {
         path: 'alerts/:id/edit',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/alerts/pages/edit-alert/edit-alert-page.component').then(
             ({ EditAlertPageComponent }) => EditAlertPageComponent,
@@ -49,6 +58,7 @@ export const routes: Routes = [
       },
       {
         path: 'alerts/:id',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/alerts/pages/alert-details/alert-details-page.component').then(
             ({ AlertDetailsPageComponent }) => AlertDetailsPageComponent,
@@ -56,6 +66,7 @@ export const routes: Routes = [
       },
       {
         path: 'history',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/history/pages/history/history-page.component').then(
             ({ HistoryPageComponent }) => HistoryPageComponent,

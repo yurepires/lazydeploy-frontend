@@ -1,4 +1,5 @@
 # Interceptors
 
-Esta pasta está reservada para os interceptors de autenticação, CSRF e tratamento
-de erros que serão adicionados na fase de integração com o backend.
+Os interceptors de autenticação ficam em `core/http`: credenciais de sessão,
+CSRF e redirecionamento após expiração de sessão. O `ApiErrorService` traduz
+respostas `ProblemDetail` em mensagens seguras para a interface.

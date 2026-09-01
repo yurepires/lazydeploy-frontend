@@ -18,8 +18,18 @@
       <span class="topbar__status-dot" aria-hidden="true"></span>
       Plataforma online
     </span>
-    <button class="topbar__account" matIconButton type="button" aria-label="Conta">
-      <mat-icon>account_circle</mat-icon>
+    <div class="topbar__account-info">
+      <mat-icon aria-hidden="true">account_circle</mat-icon>
+      <span>{{ authService.currentUser()?.email }}</span>
+    </div>
+    <button
+      class="topbar__logout"
+      matIconButton
+      type="button"
+      aria-label="Sair da conta"
+      (click)="logout()"
+    >
+      <mat-icon>logout</mat-icon>
     </button>
   </mat-toolbar>
 

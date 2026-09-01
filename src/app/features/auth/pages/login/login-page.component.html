@@ -4,22 +4,75 @@
 
   <section class="auth-card glass-dialog" aria-labelledby="login-title">
     <app-brand-mark />
-    <p class="eyebrow">Área restrita</p>
     <h1 id="login-title">Bem-vindo de volta</h1>
     <p class="auth-card__description">
       Entre para acompanhar seus alertas de servidores Battlefield em um só lugar.
     </p>
 
-    <div class="form-preview" aria-label="Formulário de login em preparação">
-      <div class="form-preview__line"><mat-icon>mail</mat-icon><span>Seu e-mail</span></div>
-      <div class="form-preview__line"><mat-icon>lock</mat-icon><span>Sua senha</span></div>
-      <span class="form-preview__badge">Autenticação na próxima fase</span>
-    </div>
+    @if (registrationCompleted()) {
+      <p class="auth-message auth-message--success" role="status">
+        Conta criada com sucesso. Entre para continuar.
+      </p>
+    }
 
-    <a class="auth-card__primary-action" matButton="filled" routerLink="/dashboard">
-      <mat-icon>visibility</mat-icon>
-      Ver demonstração
-    </a>
+    @if (errorMessage()) {
+      <p class="auth-message auth-message--error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <mat-form-field appearance="outline">
+        <mat-label>E-mail</mat-label>
+        <mat-icon matPrefix>mail</mat-icon>
+        <input matInput type="email" autocomplete="email" formControlName="email" />
+        @if (emailControl.hasError('required')) {
+          <mat-error>Informe seu e-mail.</mat-error>
+        } @else if (emailControl.hasError('email')) {
+          <mat-error>Informe um e-mail válido.</mat-error>
+        } @else if (fieldErrorFor('email')) {
+          <mat-error>{{ fieldErrorFor('email') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Senha</mat-label>
+        <mat-icon matPrefix>lock</mat-icon>
+        <input
+          matInput
+          [type]="passwordVisible() ? 'text' : 'password'"
+          autocomplete="current-password"
+          formControlName="password"
+        />
+        <button
+          matIconButton
+          matSuffix
+          type="button"
+          [attr.aria-label]="passwordVisible() ? 'Ocultar senha' : 'Mostrar senha'"
+          (click)="togglePasswordVisibility()"
+        >
+          <mat-icon>{{ passwordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (passwordControl.hasError('required')) {
+          <mat-error>Informe sua senha.</mat-error>
+        } @else if (fieldErrorFor('password')) {
+          <mat-error>{{ fieldErrorFor('password') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <button
+        class="auth-card__primary-action"
+        matButton="filled"
+        type="submit"
+        [disabled]="submitting()"
+      >
+        <mat-icon>{{ submitting() ? 'hourglass_top' : 'login' }}</mat-icon>
+        @if (submitting()) {
+          <mat-progress-spinner diameter="18" mode="indeterminate" />
+          Entrando...
+        } @else {
+          Entrar
+        }
+      </button>
+    </form>
     <p class="auth-card__footer">
       Ainda não possui acesso?
       <a routerLink="/register">Criar uma conta</a>

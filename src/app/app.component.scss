@@ -1,3 +1,32 @@
 :host {
   display: contents;
 }
+
+.app-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-content: center;
+  gap: 0.75rem;
+  background: rgba(5, 8, 13, 0.82);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  backdrop-filter: blur(12px);
+}
+
+.app-loading__spinner {
+  width: 1.9rem;
+  height: 1.9rem;
+  margin: 0 auto;
+  border: 2px solid rgba(110, 231, 211, 0.2);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: app-loading-spin 750ms linear infinite;
+}
+
+@keyframes app-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -10,17 +10,93 @@
       Configure alertas inteligentes e saiba quando seus servidores estiverem prontos para jogar.
     </p>
 
-    <div class="form-preview" aria-label="Formulário de cadastro em preparação">
-      <div class="form-preview__line"><mat-icon>person</mat-icon><span>Seu nome</span></div>
-      <div class="form-preview__line"><mat-icon>mail</mat-icon><span>Seu e-mail</span></div>
-      <div class="form-preview__line"><mat-icon>lock</mat-icon><span>Crie uma senha</span></div>
-      <span class="form-preview__badge">Cadastro na próxima fase</span>
-    </div>
+    @if (errorMessage()) {
+      <p class="auth-message auth-message--error" role="alert">{{ errorMessage() }}</p>
+    }
 
-    <a class="auth-card__primary-action" matButton="filled" routerLink="/dashboard">
-      <mat-icon>rocket_launch</mat-icon>
-      Explorar a plataforma
-    </a>
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <mat-form-field appearance="outline">
+        <mat-label>E-mail</mat-label>
+        <mat-icon matPrefix>mail</mat-icon>
+        <input matInput type="email" autocomplete="email" formControlName="email" />
+        @if (emailControl.hasError('required')) {
+          <mat-error>Informe seu e-mail.</mat-error>
+        } @else if (emailControl.hasError('email')) {
+          <mat-error>Informe um e-mail válido.</mat-error>
+        } @else if (fieldErrorFor('email')) {
+          <mat-error>{{ fieldErrorFor('email') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Senha</mat-label>
+        <mat-icon matPrefix>lock</mat-icon>
+        <input
+          matInput
+          [type]="passwordVisible() ? 'text' : 'password'"
+          autocomplete="new-password"
+          formControlName="password"
+        />
+        <button
+          matIconButton
+          matSuffix
+          type="button"
+          [attr.aria-label]="passwordVisible() ? 'Ocultar senha' : 'Mostrar senha'"
+          (click)="togglePasswordVisibility()"
+        >
+          <mat-icon>{{ passwordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (passwordControl.hasError('required')) {
+          <mat-error>Informe uma senha.</mat-error>
+        } @else if (passwordControl.hasError('minlength')) {
+          <mat-error>A senha deve ter pelo menos 8 caracteres.</mat-error>
+        } @else if (fieldErrorFor('password')) {
+          <mat-error>{{ fieldErrorFor('password') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Confirme a senha</mat-label>
+        <mat-icon matPrefix>lock_reset</mat-icon>
+        <input
+          matInput
+          [type]="confirmPasswordVisible() ? 'text' : 'password'"
+          autocomplete="new-password"
+          formControlName="confirmPassword"
+        />
+        <button
+          matIconButton
+          matSuffix
+          type="button"
+          [attr.aria-label]="
+            confirmPasswordVisible() ? 'Ocultar confirmação' : 'Mostrar confirmação'
+          "
+          (click)="toggleConfirmPasswordVisibility()"
+        >
+          <mat-icon>{{ confirmPasswordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (confirmPasswordControl.hasError('required')) {
+          <mat-error>Confirme sua senha.</mat-error>
+        } @else if (form.hasError('passwordMismatch')) {
+          <mat-error>As senhas precisam ser iguais.</mat-error>
+        }
+      </mat-form-field>
+
+      <button
+        class="auth-card__primary-action"
+        matButton="filled"
+        type="submit"
+        [disabled]="submitting()"
+      >
+        <mat-icon>{{ submitting() ? 'hourglass_top' : 'person_add' }}</mat-icon>
+        @if (submitting()) {
+          <mat-progress-spinner diameter="18" mode="indeterminate" />
+          Criando conta...
+        } @else {
+          Criar conta
+        }
+      </button>
+    </form>
     <p class="auth-card__footer">
       Já possui uma conta?
       <a routerLink="/login">Fazer login</a>

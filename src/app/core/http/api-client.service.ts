@@ -17,10 +17,14 @@ export class ApiClientService {
     return this.http.get<TResponse>(this.buildUrl(resourcePath), options);
   }
 
+  post<TResponse, TRequest>(resourcePath: string, body: TRequest): Observable<TResponse> {
+    return this.http.post<TResponse>(this.buildUrl(resourcePath), body);
+  }
+
   private buildUrl(resourcePath: string): string {
     const baseUrl = this.apiConfig.baseUrl.replace(/\/$/, '');
     const apiPath = this.apiConfig.apiPath.replace(/^\/?/, '/').replace(/\/$/, '');
-    const normalizedResourcePath = resourcePath.replace(/^\/?/, '/');
+    const normalizedResourcePath = resourcePath ? resourcePath.replace(/^\/?/, '/') : '';
 
     return `${baseUrl}${apiPath}${normalizedResourcePath}`;
   }
