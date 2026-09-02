@@ -3,6 +3,10 @@ import { Observable } from 'rxjs';
 
 import { ApiClientService } from '../../../core/http/api-client.service';
 import {
+  ConfiguredSubscriptionResponse,
+  ConfigureSubscriptionRequest,
+} from '../../alerts/models/configure-subscription-request.model';
+import {
   SubscriptionSummary,
   UpdateSubscriptionRequest,
 } from '../models/subscription-summary.model';
@@ -28,6 +32,13 @@ export class SubscriptionService {
 
   delete(id: string): Observable<void> {
     return this.apiClient.delete<void>(this.subscriptionPath(id));
+  }
+
+  configure(request: ConfigureSubscriptionRequest): Observable<ConfiguredSubscriptionResponse> {
+    return this.apiClient.post<ConfiguredSubscriptionResponse, ConfigureSubscriptionRequest>(
+      '/bf4/subscriptions/configure',
+      request,
+    );
   }
 
   private subscriptionPath(id: string): string {

@@ -1,0 +1,53 @@
+<article
+  class="server-result glass-card"
+  [class.server-result--selected]="selected()"
+  [attr.aria-label]="'Servidor ' + result().displayName"
+>
+  <div class="server-result__heading">
+    <span class="server-result__icon" aria-hidden="true">
+      <mat-icon>dns</mat-icon>
+    </span>
+    <div class="server-result__identity">
+      <p class="eyebrow">Servidor encontrado</p>
+      <h3>{{ result().displayName }}</h3>
+    </div>
+    @if (selected()) {
+      <span class="server-result__selected-indicator" aria-label="Servidor selecionado">
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+      </span>
+    }
+  </div>
+
+  <dl class="server-result__details">
+    <div>
+      <dt><mat-icon aria-hidden="true">map</mat-icon> Mapa atual</dt>
+      <dd>{{ mapLabel() }}</dd>
+    </div>
+    <div>
+      <dt><mat-icon aria-hidden="true">groups</mat-icon> Jogadores</dt>
+      <dd>{{ playersLabel() }}</dd>
+    </div>
+    @if (queueLabel(); as queue) {
+      <div>
+        <dt><mat-icon aria-hidden="true">hourglass_empty</mat-icon> Fila</dt>
+        <dd>{{ queue }}</dd>
+      </div>
+    }
+    <div>
+      <dt><mat-icon aria-hidden="true">sports_esports</mat-icon> Modo</dt>
+      <dd>{{ gameModeLabel() }}</dd>
+    </div>
+  </dl>
+
+  <button
+    class="server-result__action"
+    matButton="outlined"
+    type="button"
+    [disabled]="selected()"
+    [attr.aria-pressed]="selected()"
+    (click)="selectServer()"
+  >
+    <mat-icon>{{ selected() ? 'check' : 'add' }}</mat-icon>
+    {{ selectionLabel() }}
+  </button>
+</article>

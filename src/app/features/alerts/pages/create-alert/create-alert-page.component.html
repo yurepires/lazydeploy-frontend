@@ -1,0 +1,321 @@
+<section class="create-alert-page" aria-labelledby="create-alert-title">
+  <header class="create-alert-page__header">
+    <a class="back-link" routerLink="/dashboard">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar ao dashboard
+    </a>
+    <p class="eyebrow">Novo alerta</p>
+    <h1 id="create-alert-title">Configure um novo alerta</h1>
+    <p class="create-alert-page__subtitle">
+      Escolha um servidor, defina as condições e confirme como deseja ser avisado.
+    </p>
+  </header>
+
+  <div class="wizard glass-panel">
+    <nav class="wizard-steps" aria-label="Etapas da configuração">
+      @for (step of steps; track step.id) {
+        <button
+          class="wizard-step"
+          [class.wizard-step--active]="currentStep() === step.index"
+          [class.wizard-step--completed]="isStepCompleted(step.index)"
+          type="button"
+          [disabled]="step.index > currentStep() || submitting()"
+          [attr.aria-current]="currentStep() === step.index ? 'step' : null"
+          (click)="goToStep(step.index)"
+        >
+          <span class="wizard-step__number">
+            @if (isStepCompleted(step.index)) {
+              <mat-icon aria-hidden="true">check</mat-icon>
+            } @else {
+              {{ step.index }}
+            }
+          </span>
+          <span class="wizard-step__label">{{ step.label }}</span>
+        </button>
+        @if (step.index < steps.length) {
+          <mat-icon class="wizard-steps__divider" aria-hidden="true">chevron_right</mat-icon>
+        }
+      }
+    </nav>
+
+    <div class="wizard__current-step" aria-live="polite">
+      Etapa {{ currentStep() }} de {{ steps.length }}: {{ currentStepLabel() }}
+    </div>
+
+    <form class="wizard-form" [formGroup]="alertForm" (ngSubmit)="submit()" novalidate>
+      @if (currentStep() === 1) {
+        <section
+          class="wizard-step-content"
+          [formGroup]="serverGroup"
+          aria-labelledby="server-step-title"
+        >
+          <div class="wizard-step-content__heading">
+            <p class="eyebrow">Etapa 1</p>
+            <h2 id="server-step-title">Qual servidor você quer monitorar?</h2>
+            <p>Pesquise pelo nome do servidor e selecione um resultado manualmente.</p>
+          </div>
+
+          <mat-form-field class="server-search-field" appearance="outline">
+            <mat-label>Nome do servidor</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input
+              matInput
+              type="search"
+              autocomplete="off"
+              placeholder="Ex.: DKG"
+              [value]="serverQuery()"
+              aria-describedby="server-search-hint"
+              (input)="onServerQueryInput($event)"
+            />
+            @if (searchingServers()) {
+              <mat-progress-spinner matSuffix diameter="20" mode="indeterminate" />
+            }
+            <mat-hint id="server-search-hint">Digite pelo menos 2 caracteres para buscar.</mat-hint>
+          </mat-form-field>
+
+          @if (serverQuery().trim().length < 2) {
+            <p class="wizard-hint" role="status">
+              A busca começa quando você informar pelo menos 2 caracteres.
+            </p>
+          } @else if (serverSearchError(); as errorMessage) {
+            <div class="wizard-feedback wizard-feedback--error" role="alert">
+              <mat-icon aria-hidden="true">cloud_off</mat-icon>
+              <div>
+                <strong>Não foi possível buscar os servidores.</strong>
+                <p>{{ errorMessage }}</p>
+                <button matButton="outlined" type="button" (click)="retryServerSearch()">
+                  <mat-icon>refresh</mat-icon>
+                  Tentar novamente
+                </button>
+              </div>
+            </div>
+          } @else if (searchingServers()) {
+            <p class="wizard-hint" role="status">Buscando servidores...</p>
+          } @else if (serverSearchStarted() && serverResults().length === 0) {
+            <div class="wizard-feedback" role="status">
+              <mat-icon aria-hidden="true">search_off</mat-icon>
+              <div>
+                <strong>Nenhum servidor encontrado.</strong>
+                <p>Tente buscar por outro nome.</p>
+              </div>
+            </div>
+          } @else if (serverResults().length > 0) {
+            <div class="server-results" aria-label="Resultados da busca">
+              @for (server of serverResults(); track server.guid) {
+                <app-server-search-result-card
+                  [result]="server"
+                  [selected]="selectedServer()?.guid === server.guid"
+                  (serverSelected)="selectServer($event)"
+                />
+              }
+            </div>
+          }
+
+          @if (selectedServer(); as server) {
+            <div class="selected-server" aria-live="polite">
+              <div class="selected-server__identity">
+                <mat-icon aria-hidden="true">check_circle</mat-icon>
+                <div>
+                  <span>Servidor escolhido</span>
+                  <strong>{{ server.displayName }}</strong>
+                </div>
+              </div>
+              <button matButton="text" type="button" (click)="clearSelectedServer()">
+                Trocar servidor
+              </button>
+            </div>
+          }
+        </section>
+      }
+
+      @if (currentStep() === 2) {
+        <section
+          class="wizard-step-content"
+          [formGroup]="conditionsGroup"
+          aria-labelledby="conditions-step-title"
+        >
+          <div class="wizard-step-content__heading">
+            <p class="eyebrow">Etapa 2</p>
+            <h2 id="conditions-step-title">Quando você quer ser avisado?</h2>
+            <p>Escolha os mapas favoritos e a quantidade mínima de jogadores.</p>
+          </div>
+
+          @if (mapsError(); as errorMessage) {
+            <div class="wizard-feedback wizard-feedback--error" role="alert">
+              <mat-icon aria-hidden="true">map</mat-icon>
+              <div>
+                <strong>Não foi possível carregar o catálogo de mapas.</strong>
+                <p>{{ errorMessage }}</p>
+                <button matButton="outlined" type="button" (click)="retryMapLoading()">
+                  <mat-icon>refresh</mat-icon>
+                  Tentar novamente
+                </button>
+              </div>
+            </div>
+          } @else {
+            <app-map-selection
+              [maps]="maps()"
+              [selectedIds]="selectedMapIds()"
+              [loading]="mapsLoading()"
+              (selectionChanged)="onMapSelectionChanged($event)"
+            />
+          }
+
+          <mat-form-field class="minimum-players-field" appearance="outline">
+            <mat-label>Mínimo de jogadores</mat-label>
+            <mat-icon matPrefix>groups</mat-icon>
+            <input
+              matInput
+              type="number"
+              min="0"
+              max="2147483647"
+              step="1"
+              formControlName="minimumPlayers"
+              aria-describedby="minimum-players-hint"
+            />
+            <mat-hint id="minimum-players-hint">
+              O alerta será enviado quando o servidor atingir pelo menos essa quantidade.
+            </mat-hint>
+            @if (minimumPlayersControl.hasError('required')) {
+              <mat-error>Informe uma quantidade mínima.</mat-error>
+            } @else if (minimumPlayersControl.hasError('integer')) {
+              <mat-error>Informe um número inteiro.</mat-error>
+            } @else if (minimumPlayersControl.hasError('min')) {
+              <mat-error>A quantidade não pode ser negativa.</mat-error>
+            } @else if (minimumPlayersControl.hasError('max')) {
+              <mat-error>Informe uma quantidade válida.</mat-error>
+            }
+          </mat-form-field>
+
+          @if (conditionsGroup.controls.mapIds.touched && conditionsGroup.controls.mapIds.invalid) {
+            <p class="field-error" role="alert">Selecione pelo menos um mapa.</p>
+          }
+        </section>
+      }
+
+      @if (currentStep() === 3) {
+        <section
+          class="wizard-step-content"
+          [formGroup]="notificationsGroup"
+          aria-labelledby="notifications-step-title"
+        >
+          <div class="wizard-step-content__heading">
+            <p class="eyebrow">Etapa 3</p>
+            <h2 id="notifications-step-title">Como deseja receber o alerta?</h2>
+            <p>Por enquanto, o LazyDeploy envia notificações por email.</p>
+          </div>
+
+          <div class="email-channel glass-card">
+            <mat-checkbox formControlName="emailEnabled">
+              <span class="email-channel__title">
+                <mat-icon aria-hidden="true">mail</mat-icon>
+                Email
+              </span>
+            </mat-checkbox>
+            <span class="email-channel__description">
+              As notificações serão enviadas para o email da sua conta.
+            </span>
+            <strong class="email-channel__address">{{ accountEmail() }}</strong>
+          </div>
+
+          @if (notificationsGroup.touched && notificationsGroup.hasError('noActiveChannel')) {
+            <p class="field-error" role="alert">Ative pelo menos um canal de notificação.</p>
+          }
+        </section>
+      }
+
+      @if (currentStep() === 4) {
+        <section class="wizard-step-content" aria-labelledby="review-step-title">
+          <div class="wizard-step-content__heading">
+            <p class="eyebrow">Etapa 4</p>
+            <h2 id="review-step-title">Revise sua configuração</h2>
+            <p>Confira os dados antes de criar o alerta.</p>
+          </div>
+
+          <div class="review-list">
+            <article class="review-item">
+              <div class="review-item__heading">
+                <mat-icon aria-hidden="true">dns</mat-icon>
+                <h3>Servidor</h3>
+              </div>
+              @if (selectedServer(); as server) {
+                <strong>{{ server.displayName }}</strong>
+                <small>GUID {{ server.guid }}</small>
+              }
+            </article>
+
+            <article class="review-item">
+              <div class="review-item__heading">
+                <mat-icon aria-hidden="true">map</mat-icon>
+                <h3>Mapas favoritos</h3>
+              </div>
+              <ul>
+                @for (mapName of selectedMapDisplayNames(); track mapName) {
+                  <li>{{ mapName }}</li>
+                }
+              </ul>
+            </article>
+
+            <article class="review-item">
+              <div class="review-item__heading">
+                <mat-icon aria-hidden="true">groups</mat-icon>
+                <h3>Mínimo de jogadores</h3>
+              </div>
+              <strong>{{ minimumPlayersControl.value }} jogadores</strong>
+            </article>
+
+            <article class="review-item">
+              <div class="review-item__heading">
+                <mat-icon aria-hidden="true">mail</mat-icon>
+                <h3>Notificação</h3>
+              </div>
+              <strong>Email habilitado</strong>
+              <small>{{ accountEmail() }}</small>
+            </article>
+          </div>
+
+          @if (submitError(); as errorMessage) {
+            <div class="wizard-feedback wizard-feedback--error" role="alert">
+              <mat-icon aria-hidden="true">error_outline</mat-icon>
+              <div>
+                <strong>Não foi possível criar o alerta.</strong>
+                <p>{{ errorMessage }}</p>
+              </div>
+            </div>
+          }
+        </section>
+      }
+
+      <footer class="wizard-actions">
+        <a class="wizard-actions__cancel" matButton="text" routerLink="/dashboard">Cancelar</a>
+        <span class="wizard-actions__spacer"></span>
+        @if (currentStep() > 1) {
+          <button
+            matButton="outlined"
+            type="button"
+            [disabled]="submitting()"
+            (click)="previousStep()"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            Voltar
+          </button>
+        }
+        @if (currentStep() < steps.length) {
+          <button matButton="filled" type="button" [disabled]="submitting()" (click)="nextStep()">
+            Próximo
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        } @else {
+          <button matButton="filled" type="submit" [disabled]="submitting()">
+            <mat-icon>{{ submitActionIcon() }}</mat-icon>
+            @if (submitting()) {
+              <span class="wizard-submit-label">Criando alerta...</span>
+            } @else {
+              <span class="wizard-submit-label">Criar alerta</span>
+            }
+          </button>
+        }
+      </footer>
+    </form>
+  </div>
+</section>

@@ -87,11 +87,19 @@
   margin-left: var(--space-sm);
   color: var(--text-secondary);
   font-size: 0.76rem;
+  line-height: 1.25rem;
 }
 
 .topbar__account-info mat-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 1.25rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
   color: var(--color-primary);
   font-size: 1.25rem;
+  line-height: 1;
 }
 
 .topbar__account-info span {

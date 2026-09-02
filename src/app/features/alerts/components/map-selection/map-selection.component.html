@@ -1,0 +1,40 @@
+<section class="map-selection" aria-labelledby="map-selection-title">
+  <div class="map-selection__heading">
+    <div>
+      <p class="eyebrow">Condições do alerta</p>
+      <h2 id="map-selection-title">Mapas favoritos</h2>
+    </div>
+    <span class="map-selection__count" aria-live="polite">
+      {{ selectedCount() }} selecionado{{ selectedCount() === 1 ? '' : 's' }}
+    </span>
+  </div>
+
+  @if (loading()) {
+    <div class="map-selection__loading" aria-busy="true" aria-label="Carregando catálogo de mapas">
+      <mat-progress-spinner diameter="28" mode="indeterminate" />
+      <span>Carregando mapas disponíveis...</span>
+    </div>
+  } @else if (maps().length === 0) {
+    <div class="map-selection__empty" role="status">
+      <mat-icon aria-hidden="true">map</mat-icon>
+      <p>Nenhum mapa disponível no catálogo.</p>
+    </div>
+  } @else {
+    <div class="map-selection__grid" role="group" aria-label="Mapas favoritos">
+      @for (map of maps(); track map.id) {
+        <label class="map-option" [class.map-option--selected]="isSelected(map.id)">
+          <mat-checkbox
+            [checked]="isSelected(map.id)"
+            [disabled]="!map.enabled"
+            (change)="toggleMap(map, $event.checked)"
+          >
+            <span class="map-option__name">{{ map.displayName }}</span>
+            @if (map.expansion) {
+              <small>{{ map.expansion }}</small>
+            }
+          </mat-checkbox>
+        </label>
+      }
+    </div>
+  }
+</section>

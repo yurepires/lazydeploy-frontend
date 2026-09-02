@@ -9,6 +9,15 @@ const FRIENDLY_MESSAGES: Record<string, string> = {
   VALIDATION_FAILED: 'Verifique os dados informados.',
   UNAUTHENTICATED: 'Sua sessão não está autenticada.',
   CSRF_VALIDATION_FAILED: 'Não foi possível validar a requisição. Tente novamente.',
+  SUBSCRIPTION_ALREADY_EXISTS: 'Você já possui um alerta para este servidor.',
+  UNKNOWN_MAP: 'Um dos mapas selecionados não está mais disponível.',
+  DUPLICATE_RULE_TYPE: 'A configuração contém condições duplicadas.',
+  DUPLICATE_CHANNEL_TYPE: 'A configuração contém canais duplicados.',
+  NO_ACTIVE_NOTIFICATION_CHANNEL: 'Ative pelo menos um canal de notificação.',
+  INVALID_RULE_PARAMETERS: 'Uma das condições configuradas é inválida.',
+  INVALID_RULE_CONFIGURATION: 'Uma das condições configuradas é inválida.',
+  INVALID_CHANNEL_CONFIGURATION: 'A configuração de notificação é inválida.',
+  EXTERNAL_PROVIDER_UNAVAILABLE: 'Não foi possível consultar os servidores agora. Tente novamente.',
   INTERNAL_ERROR: 'Ocorreu um erro inesperado. Tente novamente.',
 };
 
