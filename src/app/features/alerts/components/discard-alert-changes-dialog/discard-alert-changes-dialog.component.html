@@ -1,0 +1,10 @@
+<h2 mat-dialog-title>Descartar alterações?</h2>
+
+<mat-dialog-content>
+  <p>As alterações feitas neste alerta ainda não foram salvas.</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton mat-dialog-close type="button">Continuar editando</button>
+  <button matButton="filled" [mat-dialog-close]="true" type="button">Descartar</button>
+</mat-dialog-actions>

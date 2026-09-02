@@ -17,6 +17,8 @@ const FRIENDLY_MESSAGES: Record<string, string> = {
   INVALID_RULE_PARAMETERS: 'Uma das condições configuradas é inválida.',
   INVALID_RULE_CONFIGURATION: 'Uma das condições configuradas é inválida.',
   INVALID_CHANNEL_CONFIGURATION: 'A configuração de notificação é inválida.',
+  RESOURCE_CONFLICT: 'A configuração foi alterada e não pôde ser salva como esperado.',
+  CONFLICT: 'A configuração foi alterada e não pôde ser salva como esperado.',
   EXTERNAL_PROVIDER_UNAVAILABLE: 'Não foi possível consultar os servidores agora. Tente novamente.',
   INTERNAL_ERROR: 'Ocorreu um erro inesperado. Tente novamente.',
 };

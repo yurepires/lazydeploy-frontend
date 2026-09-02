@@ -1,0 +1,132 @@
+<section class="alert-details-page" aria-labelledby="alert-details-title">
+  @if (loading()) {
+    <section class="details-loading glass-panel" aria-busy="true" aria-label="Carregando alerta">
+      <mat-progress-spinner diameter="34" mode="indeterminate" />
+      <div>
+        <p class="eyebrow">Detalhes do alerta</p>
+        <h1 id="alert-details-title">Carregando configuração...</h1>
+        <p>Estamos buscando os dados deste alerta.</p>
+      </div>
+    </section>
+  } @else if (notFound()) {
+    <section class="details-feedback glass-panel" aria-labelledby="alert-details-title">
+      <div class="details-feedback__icon" aria-hidden="true">
+        <mat-icon>search_off</mat-icon>
+      </div>
+      <p class="eyebrow">Detalhes do alerta</p>
+      <h1 id="alert-details-title">Alerta não encontrado</h1>
+      <p>Este alerta não existe ou não está disponível para a sua conta.</p>
+      <button matButton="filled" type="button" (click)="goBackToDashboard()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar para Dashboard
+      </button>
+    </section>
+  } @else if (loadError(); as errorMessage) {
+    <section
+      class="details-feedback glass-panel"
+      aria-labelledby="alert-details-title"
+      role="alert"
+    >
+      <div class="details-feedback__icon details-feedback__icon--error" aria-hidden="true">
+        <mat-icon>cloud_off</mat-icon>
+      </div>
+      <p class="eyebrow">Detalhes do alerta</p>
+      <h1 id="alert-details-title">Não foi possível carregar o alerta</h1>
+      <p>{{ errorMessage }}</p>
+      <div class="details-feedback__actions">
+        <button matButton="filled" type="button" (click)="retryLoad()">
+          <mat-icon>refresh</mat-icon>
+          Tentar novamente
+        </button>
+        <button matButton="text" type="button" (click)="goBackToDashboard()">
+          Voltar para Dashboard
+        </button>
+      </div>
+    </section>
+  } @else if (subscription(); as currentSubscription) {
+    <a class="back-link" routerLink="/dashboard">
+      <mat-icon aria-hidden="true">arrow_back</mat-icon>
+      Voltar para Dashboard
+    </a>
+
+    <header class="alert-details-page__header">
+      <div class="alert-details-page__identity">
+        <p class="eyebrow">Detalhes do alerta</p>
+        <h1 id="alert-details-title">{{ currentSubscription.server.displayName }}</h1>
+        <p class="alert-details-page__guid">GUID {{ currentSubscription.server.guid }}</p>
+      </div>
+
+      <div class="alert-details-page__controls">
+        <span
+          class="alert-details-page__status"
+          [class.alert-details-page__status--disabled]="!currentSubscription.enabled"
+        >
+          <mat-icon aria-hidden="true">{{ statusIcon() }}</mat-icon>
+          {{ statusLabel() }}
+        </span>
+
+        <div class="alert-details-page__actions" aria-label="Ações do alerta">
+          <a
+            matButton="outlined"
+            [routerLink]="deleting() ? null : ['/alerts', currentSubscription.id, 'edit']"
+            [class.alert-details-action--disabled]="deleting()"
+            [attr.aria-disabled]="deleting() ? 'true' : null"
+            [attr.tabindex]="deleting() ? -1 : 0"
+            (click)="preventEditWhileDeleting($event)"
+          >
+            <mat-icon>edit</mat-icon>
+            Editar
+          </a>
+          <button
+            matButton="outlined"
+            type="button"
+            [disabled]="busy()"
+            [attr.aria-label]="toggleLabel() + ' alerta'"
+            (click)="toggleSubscription()"
+          >
+            @if (updating()) {
+              <mat-icon>sync</mat-icon>
+            } @else {
+              <mat-icon>{{ toggleIcon() }}</mat-icon>
+            }
+            {{ toggleLabel() }}
+          </button>
+          <button
+            class="alert-details-page__delete"
+            matButton="text"
+            type="button"
+            [disabled]="busy()"
+            (click)="requestDelete()"
+          >
+            @if (deleting()) {
+              <mat-icon>sync</mat-icon>
+            } @else {
+              <mat-icon>delete_outline</mat-icon>
+            }
+            Remover
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="alert-details-page__sections">
+      <app-alert-overview [subscription]="currentSubscription" />
+      <app-alert-conditions [rules]="currentSubscription.rules" [maps]="maps()" />
+      <app-alert-notification-channels
+        [channels]="currentSubscription.channels"
+        [accountEmail]="accountEmail()"
+      />
+
+      <section class="history-placeholder glass-panel" aria-labelledby="history-placeholder-title">
+        <div class="history-placeholder__icon" aria-hidden="true">
+          <mat-icon>history</mat-icon>
+        </div>
+        <div>
+          <p class="eyebrow">Em breve</p>
+          <h2 id="history-placeholder-title">Últimas notificações</h2>
+          <p>O histórico deste alerta será exibido aqui.</p>
+        </div>
+      </section>
+    </div>
+  }
+</section>

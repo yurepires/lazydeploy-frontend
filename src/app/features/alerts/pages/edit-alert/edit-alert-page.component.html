@@ -1,0 +1,244 @@
+<section class="edit-alert-page" aria-labelledby="edit-alert-title">
+  @if (loading()) {
+    <section
+      class="edit-alert-feedback glass-panel"
+      aria-busy="true"
+      aria-label="Carregando alerta"
+    >
+      <mat-progress-spinner diameter="34" mode="indeterminate" />
+      <div>
+        <p class="eyebrow">Editar alerta</p>
+        <h1 id="edit-alert-title">Carregando configuração...</h1>
+        <p>Estamos buscando o alerta e o catálogo de mapas.</p>
+      </div>
+    </section>
+  } @else if (notFound()) {
+    <section class="edit-alert-feedback glass-panel" aria-labelledby="edit-alert-title">
+      <div class="edit-alert-feedback__icon" aria-hidden="true">
+        <mat-icon>search_off</mat-icon>
+      </div>
+      <p class="eyebrow">Editar alerta</p>
+      <h1 id="edit-alert-title">Alerta não encontrado</h1>
+      <p>Este alerta não existe ou não está disponível para a sua conta.</p>
+      <button matButton="filled" type="button" (click)="goToDashboard()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar para Dashboard
+      </button>
+    </section>
+  } @else if (invalidConfiguration()) {
+    <section
+      class="edit-alert-feedback glass-panel"
+      aria-labelledby="edit-alert-title"
+      role="alert"
+    >
+      <div class="edit-alert-feedback__icon edit-alert-feedback__icon--error" aria-hidden="true">
+        <mat-icon>rule</mat-icon>
+      </div>
+      <p class="eyebrow">Editar alerta</p>
+      <h1 id="edit-alert-title">Não foi possível editar este alerta</h1>
+      <p>A configuração atual do alerta está incompleta ou inválida.</p>
+      <div class="edit-alert-feedback__actions">
+        <button matButton="filled" type="button" (click)="retryLoad()">
+          <mat-icon>refresh</mat-icon>
+          Tentar recarregar
+        </button>
+        <button matButton="text" type="button" (click)="goToDetails()">Voltar para detalhes</button>
+        <button matButton="text" type="button" (click)="goToDashboard()">
+          Voltar para Dashboard
+        </button>
+      </div>
+    </section>
+  } @else if (loadError(); as errorMessage) {
+    <section
+      class="edit-alert-feedback glass-panel"
+      aria-labelledby="edit-alert-title"
+      role="alert"
+    >
+      <div class="edit-alert-feedback__icon edit-alert-feedback__icon--error" aria-hidden="true">
+        <mat-icon>cloud_off</mat-icon>
+      </div>
+      <p class="eyebrow">Editar alerta</p>
+      <h1 id="edit-alert-title">Não foi possível carregar o alerta</h1>
+      <p>{{ errorMessage }}</p>
+      <div class="edit-alert-feedback__actions">
+        <button matButton="filled" type="button" (click)="retryLoad()">
+          <mat-icon>refresh</mat-icon>
+          Tentar novamente
+        </button>
+        <button matButton="text" type="button" (click)="goToDetails()">Voltar para detalhes</button>
+        <button matButton="text" type="button" (click)="goToDashboard()">
+          Voltar para Dashboard
+        </button>
+      </div>
+    </section>
+  } @else if (subscription(); as currentSubscription) {
+    <a class="back-link" [routerLink]="['/alerts', currentSubscription.id]">
+      <mat-icon aria-hidden="true">arrow_back</mat-icon>
+      Voltar para detalhes
+    </a>
+
+    <header class="edit-alert-page__header">
+      <div>
+        <p class="eyebrow">Editar alerta</p>
+        <h1 id="edit-alert-title">{{ currentSubscription.server.displayName }}</h1>
+        <p class="edit-alert-page__subtitle">
+          Atualize as condições deste alerta sem trocar o servidor ou o canal de notificação.
+        </p>
+      </div>
+      <span
+        class="edit-alert-page__status"
+        [class.edit-alert-page__status--disabled]="!currentSubscription.enabled"
+      >
+        <mat-icon aria-hidden="true">{{ statusIcon() }}</mat-icon>
+        {{ statusLabel() }}
+      </span>
+    </header>
+
+    <form class="edit-alert-form" [formGroup]="editAlertForm" (ngSubmit)="saveChanges()" novalidate>
+      <section class="edit-alert-section glass-panel" aria-labelledby="edit-server-title">
+        <header class="edit-alert-section__header">
+          <div>
+            <p class="eyebrow">Identidade do alerta</p>
+            <h2 id="edit-server-title">Servidor</h2>
+          </div>
+          <div class="edit-alert-section__icon" aria-hidden="true">
+            <mat-icon>dns</mat-icon>
+          </div>
+        </header>
+
+        <div class="readonly-server">
+          <div class="readonly-server__identity">
+            <span class="readonly-server__label">Servidor monitorado</span>
+            <strong>{{ currentSubscription.server.displayName }}</strong>
+            <small>GUID {{ currentSubscription.server.guid }}</small>
+          </div>
+          <span class="readonly-server__badge">
+            <mat-icon aria-hidden="true">lock</mat-icon>
+            Não editável
+          </span>
+        </div>
+        <p class="edit-alert-section__hint">Para monitorar outro servidor, crie um novo alerta.</p>
+      </section>
+
+      <section
+        class="edit-alert-section glass-panel"
+        formGroupName="conditions"
+        aria-labelledby="edit-conditions-title"
+      >
+        <header class="edit-alert-section__header">
+          <div>
+            <p class="eyebrow">Preferências</p>
+            <h2 id="edit-conditions-title">Condições</h2>
+          </div>
+          <div class="edit-alert-section__icon edit-alert-section__icon--accent" aria-hidden="true">
+            <mat-icon>tune</mat-icon>
+          </div>
+        </header>
+
+        <app-map-selection
+          [maps]="selectableMaps()"
+          [selectedIds]="selectedMapIds()"
+          [loading]="saving()"
+          (selectionChanged)="onMapSelectionChanged($event)"
+        />
+
+        @if (selectedMapIds().length > 0) {
+          <p class="edit-alert-section__hint" role="status">
+            IDs técnicos serão enviados ao backend; os nomes acima são apenas para exibição.
+          </p>
+        }
+
+        <mat-form-field class="minimum-players-field" appearance="outline">
+          <mat-label>Mínimo de jogadores</mat-label>
+          <mat-icon matPrefix>groups</mat-icon>
+          <input
+            matInput
+            type="number"
+            min="0"
+            max="2147483647"
+            step="1"
+            formControlName="minimumPlayers"
+            aria-describedby="edit-minimum-players-hint"
+            (input)="onMinimumPlayersChanged()"
+          />
+          <mat-hint id="edit-minimum-players-hint">
+            O alerta será avaliado quando o servidor atingir pelo menos essa quantidade.
+          </mat-hint>
+          @if (minimumPlayersControl.hasError('required')) {
+            <mat-error>Informe uma quantidade mínima.</mat-error>
+          } @else if (minimumPlayersControl.hasError('integer')) {
+            <mat-error>Informe um número inteiro.</mat-error>
+          } @else if (minimumPlayersControl.hasError('min')) {
+            <mat-error>A quantidade não pode ser negativa.</mat-error>
+          } @else if (minimumPlayersControl.hasError('max')) {
+            <mat-error>Informe uma quantidade válida.</mat-error>
+          }
+        </mat-form-field>
+
+        @if (conditionsGroup.controls.mapIds.touched && conditionsGroup.controls.mapIds.invalid) {
+          <p class="field-error" role="alert">Selecione pelo menos um mapa.</p>
+        }
+      </section>
+
+      <section class="edit-alert-section glass-panel" aria-labelledby="edit-notification-title">
+        <header class="edit-alert-section__header">
+          <div>
+            <p class="eyebrow">Destino das mensagens</p>
+            <h2 id="edit-notification-title">Notificação</h2>
+          </div>
+          <div
+            class="edit-alert-section__icon edit-alert-section__icon--warning"
+            aria-hidden="true"
+          >
+            <mat-icon>send</mat-icon>
+          </div>
+        </header>
+
+        <div class="email-channel glass-card">
+          <div class="email-channel__icon" aria-hidden="true">
+            <mat-icon>mail</mat-icon>
+          </div>
+          <div class="email-channel__content">
+            <div class="email-channel__title-row">
+              <h3>Email</h3>
+              <span class="email-channel__badge">Canal ativo</span>
+            </div>
+            <p>As notificações deste alerta são enviadas para o email da sua conta.</p>
+            <strong>{{ accountEmail() }}</strong>
+          </div>
+          <mat-icon class="email-channel__lock" aria-label="Canal não editável">lock</mat-icon>
+        </div>
+        <p class="edit-alert-section__hint">
+          Para parar as notificações, desative o alerta na página de detalhes.
+        </p>
+      </section>
+
+      @if (saveError(); as errorMessage) {
+        <div class="edit-alert-save-error" role="alert">
+          <mat-icon aria-hidden="true">error_outline</mat-icon>
+          <p>{{ errorMessage }}</p>
+        </div>
+      }
+
+      <footer class="edit-alert-actions">
+        <span class="edit-alert-actions__spacer"></span>
+        <button matButton="outlined" type="button" [disabled]="busy()" (click)="goToDetails()">
+          <mat-icon>close</mat-icon>
+          Cancelar
+        </button>
+        <button
+          matButton="filled"
+          type="submit"
+          [disabled]="editAlertForm.invalid || !hasChanges() || busy()"
+        >
+          @if (saving()) {
+            <mat-progress-spinner diameter="18" mode="indeterminate" />
+          } @else {
+            <mat-icon>save</mat-icon>
+          }
+          <span>{{ saveButtonLabel() }}</span>
+        </button>
+      </footer>
+    </form>
+  }
+</section>

@@ -21,6 +21,12 @@ export interface RuleSummary {
   readonly parameters: Record<string, unknown>;
 }
 
+export interface UpdateRuleRequest {
+  readonly type: string;
+  readonly enabled: boolean;
+  readonly parameters: Record<string, unknown>;
+}
+
 export interface ChannelSummary {
   readonly id: string;
   readonly type: string;

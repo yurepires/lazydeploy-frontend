@@ -77,6 +77,34 @@ describe('SubscriptionService', () => {
     expect(completed).toBe(true);
   });
 
+  it('should patch an existing rule with its updated parameters', () => {
+    const rule = {
+      id: 'rule-1',
+      type: 'MAP_IN',
+      enabled: true,
+      parameters: { values: ['XP0_Metro'] },
+    };
+
+    service
+      .updateRule('subscription-1', 'rule-1', {
+        type: 'MAP_IN',
+        enabled: true,
+        parameters: { values: ['XP0_Metro'] },
+      })
+      .subscribe();
+
+    const request = httpTesting.expectOne(
+      'http://localhost:8080/api/bf4/subscriptions/subscription-1/rules/rule-1',
+    );
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({
+      type: 'MAP_IN',
+      enabled: true,
+      parameters: { values: ['XP0_Metro'] },
+    });
+    request.flush(rule);
+  });
+
   it('should configure a subscription atomically', () => {
     const request: ConfigureSubscriptionRequest = {
       serverGuid: 'server-guid-1',

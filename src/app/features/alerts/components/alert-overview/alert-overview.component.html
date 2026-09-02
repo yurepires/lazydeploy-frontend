@@ -1,0 +1,45 @@
+<section class="alert-overview glass-panel" aria-labelledby="alert-overview-title">
+  <header class="alert-overview__header">
+    <div>
+      <p class="eyebrow">Visão geral</p>
+      <h2 id="alert-overview-title">Resumo do alerta</h2>
+    </div>
+    <div class="alert-overview__icon" aria-hidden="true">
+      <mat-icon>info</mat-icon>
+    </div>
+  </header>
+
+  <dl class="alert-overview__list">
+    <div class="alert-overview__item alert-overview__item--wide">
+      <dt>Servidor monitorado</dt>
+      <dd>{{ subscription().server.displayName }}</dd>
+    </div>
+
+    <div class="alert-overview__item">
+      <dt>Status do alerta</dt>
+      <dd>
+        <span
+          class="alert-overview__status"
+          [class.alert-overview__status--disabled]="!subscription().enabled"
+        >
+          <mat-icon aria-hidden="true">{{ statusIcon() }}</mat-icon>
+          {{ statusLabel() }}
+        </span>
+      </dd>
+    </div>
+
+    @if (subscription().createdAt) {
+      <div class="alert-overview__item">
+        <dt>Criado em</dt>
+        <dd>{{ subscription().createdAt | date: 'dd/MM/yyyy, HH:mm' }}</dd>
+      </div>
+    }
+
+    @if (subscription().updatedAt) {
+      <div class="alert-overview__item">
+        <dt>Última atualização</dt>
+        <dd>{{ subscription().updatedAt | date: 'dd/MM/yyyy, HH:mm' }}</dd>
+      </div>
+    }
+  </dl>
+</section>

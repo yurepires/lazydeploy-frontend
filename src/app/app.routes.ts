@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { AppShellComponent } from './core/layout/app-shell.component';
 import { authGuard, rootRedirectGuard } from './core/guards/auth.guard';
+import { pendingAlertChangesGuard } from './core/guards/pending-alert-changes.guard';
 import { guestGuard as guestRouteGuard } from './core/guards/guest.guard';
 import { RootRedirectComponent } from './core/routing/root-redirect.component';
 
@@ -51,6 +52,7 @@ export const routes: Routes = [
       {
         path: 'alerts/:id/edit',
         canActivate: [authGuard],
+        canDeactivate: [pendingAlertChangesGuard],
         loadComponent: () =>
           import('./features/alerts/pages/edit-alert/edit-alert-page.component').then(
             ({ EditAlertPageComponent }) => EditAlertPageComponent,

@@ -1,0 +1,43 @@
+<section class="alert-conditions glass-panel" aria-labelledby="alert-conditions-title">
+  <header class="alert-conditions__header">
+    <div>
+      <p class="eyebrow">Configuração</p>
+      <h2 id="alert-conditions-title">Condições</h2>
+    </div>
+    <div class="alert-conditions__icon" aria-hidden="true">
+      <mat-icon>tune</mat-icon>
+    </div>
+  </header>
+
+  @if (conditions().length === 0) {
+    <p class="alert-conditions__empty">Nenhuma condição configurada para este alerta.</p>
+  } @else {
+    <div class="alert-conditions__list">
+      @for (condition of conditions(); track condition.id) {
+        <article class="condition-card" [class.condition-card--disabled]="!condition.enabled">
+          <div class="condition-card__icon" aria-hidden="true">
+            <mat-icon>{{ condition.presentation.icon }}</mat-icon>
+          </div>
+          <div class="condition-card__content">
+            <div class="condition-card__title-row">
+              <h3>{{ condition.presentation.label }}</h3>
+              @if (!condition.enabled) {
+                <span class="condition-card__state">Desativada</span>
+              }
+            </div>
+
+            @if (condition.mapNames.length > 0) {
+              <ul class="condition-card__maps">
+                @for (mapName of condition.mapNames; track mapName) {
+                  <li>{{ mapName }}</li>
+                }
+              </ul>
+            } @else {
+              <p>{{ condition.presentation.description }}</p>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

@@ -44,8 +44,41 @@ export function presentChannel(channel: ChannelSummary): ChannelPresentation {
   }
 }
 
+/**
+ * Returns the technical identifiers configured by a MAP_IN rule.
+ *
+ * Keeping this extraction next to the rule presenter prevents each screen from
+ * having to know how rule parameters are represented by the API.
+ */
+export function mapIdsFromRule(rule: RuleSummary): string[] {
+  if (rule.type.toUpperCase() !== 'MAP_IN') {
+    return [];
+  }
+
+  if (!rule.parameters || typeof rule.parameters !== 'object') {
+    return [];
+  }
+
+  return readStringArray(rule.parameters['values']);
+}
+
+/**
+ * Returns the minimum player count configured by a PLAYER_COUNT_AT_LEAST rule.
+ */
+export function minimumPlayersFromRule(rule: RuleSummary): number | null {
+  if (rule.type.toUpperCase() !== 'PLAYER_COUNT_AT_LEAST') {
+    return null;
+  }
+
+  if (!rule.parameters || typeof rule.parameters !== 'object') {
+    return null;
+  }
+
+  return readNumber(rule.parameters['value']);
+}
+
 function presentMapRule(rule: RuleSummary): RulePresentation {
-  const values = readStringArray(rule.parameters['values']);
+  const values = mapIdsFromRule(rule);
 
   if (values.length === 0) {
     return {
@@ -70,7 +103,7 @@ function presentMapRule(rule: RuleSummary): RulePresentation {
 }
 
 function presentPlayerCountRule(rule: RuleSummary): RulePresentation {
-  const minimumPlayers = readNumber(rule.parameters['value']);
+  const minimumPlayers = minimumPlayersFromRule(rule);
 
   if (minimumPlayers === null) {
     return {

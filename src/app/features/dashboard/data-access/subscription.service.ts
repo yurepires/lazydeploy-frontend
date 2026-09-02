@@ -7,7 +7,9 @@ import {
   ConfigureSubscriptionRequest,
 } from '../../alerts/models/configure-subscription-request.model';
 import {
+  RuleSummary,
   SubscriptionSummary,
+  UpdateRuleRequest,
   UpdateSubscriptionRequest,
 } from '../models/subscription-summary.model';
 
@@ -28,6 +30,16 @@ export class SubscriptionService {
       this.subscriptionPath(id),
       request,
     );
+  }
+
+  updateRule(
+    subscriptionId: string,
+    ruleId: string,
+    request: UpdateRuleRequest,
+  ): Observable<RuleSummary> {
+    const rulePath = `${this.subscriptionPath(subscriptionId)}/rules/${encodeURIComponent(ruleId)}`;
+
+    return this.apiClient.patch<RuleSummary, UpdateRuleRequest>(rulePath, request);
   }
 
   delete(id: string): Observable<void> {

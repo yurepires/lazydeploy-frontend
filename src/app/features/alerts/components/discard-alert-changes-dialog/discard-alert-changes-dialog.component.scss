@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  min-width: min(100%, 26rem);
+}
+
+p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}

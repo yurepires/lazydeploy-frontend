@@ -1,0 +1,43 @@
+<section
+  class="alert-notification-channels glass-panel"
+  aria-labelledby="alert-notification-channels-title"
+>
+  <header class="alert-notification-channels__header">
+    <div>
+      <p class="eyebrow">Entrega</p>
+      <h2 id="alert-notification-channels-title">Notificações</h2>
+    </div>
+    <div class="alert-notification-channels__icon" aria-hidden="true">
+      <mat-icon>send</mat-icon>
+    </div>
+  </header>
+
+  @if (presentedChannels().length === 0) {
+    <p class="alert-notification-channels__empty">Nenhum canal configurado para este alerta.</p>
+  } @else {
+    <div class="alert-notification-channels__list">
+      @for (channel of presentedChannels(); track channel.id) {
+        <article class="channel-card" [class.channel-card--disabled]="!channel.enabled">
+          <div class="channel-card__icon" aria-hidden="true">
+            <mat-icon>{{ channel.presentation.icon }}</mat-icon>
+          </div>
+          <div class="channel-card__content">
+            <div class="channel-card__title-row">
+              <h3>{{ channel.presentation.label }}</h3>
+              <span
+                class="channel-card__state"
+                [class.channel-card__state--disabled]="!channel.enabled"
+              >
+                {{ channel.enabled ? 'Ativo' : 'Desativado' }}
+              </span>
+            </div>
+            <p>{{ channel.presentation.description }}</p>
+            @if (channel.type.toUpperCase() === 'EMAIL' && accountEmail()) {
+              <span class="channel-card__address">Destino: {{ accountEmail() }}</span>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
