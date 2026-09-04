@@ -1,0 +1,171 @@
+<section class="history-page" aria-labelledby="history-title">
+  <a class="back-link" routerLink="/dashboard">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    Voltar para Dashboard
+  </a>
+
+  <header class="history-page__header">
+    <div>
+      <p class="eyebrow">Rastreamento</p>
+      <h1 id="history-title">Histórico de notificações</h1>
+      <p class="history-page__subtitle">
+        Consulte as tentativas de envio registradas pelo LazyDeploy, preservando o estado de cada
+        momento.
+      </p>
+    </div>
+    <div class="history-page__header-icon" aria-hidden="true">
+      <mat-icon>history</mat-icon>
+    </div>
+  </header>
+
+  <section class="history-filters glass-panel" aria-labelledby="history-filters-title">
+    <div class="history-filters__heading">
+      <div>
+        <p class="eyebrow">Refine a consulta</p>
+        <h2 id="history-filters-title">Filtros</h2>
+      </div>
+      @if (isFiltered()) {
+        <button matButton="text" type="button" (click)="clearFilters()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpar filtros
+        </button>
+      }
+    </div>
+
+    <div class="history-filters__fields">
+      <mat-form-field
+        class="history-filters__field"
+        appearance="outline"
+        subscriptSizing="dynamic"
+      >
+        <mat-label>Status</mat-label>
+        <mat-select
+          [value]="statusFilter() ?? ''"
+          (selectionChange)="onStatusChanged($event.value)"
+        >
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="SUCCESS">Sucesso</mat-option>
+          <mat-option value="FAILED">Falha</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field
+        class="history-filters__field"
+        appearance="outline"
+        subscriptSizing="dynamic"
+      >
+        <mat-label>Canal</mat-label>
+        <mat-select
+          [value]="channelFilter() ?? ''"
+          (selectionChange)="onChannelChanged($event.value)"
+        >
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="EMAIL">Email</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      @if (subscriptionIdFilter(); as subscriptionId) {
+        <div class="history-filters__subscription">
+          <mat-icon aria-hidden="true">notifications</mat-icon>
+          <span
+            >Filtrando o alerta <strong>{{ subscriptionId }}</strong></span
+          >
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (loading()) {
+    <section class="history-state" aria-busy="true" aria-label="Carregando histórico">
+      <span class="sr-only">Carregando histórico de notificações...</span>
+      <div class="history-list history-list--loading">
+        @for (placeholder of loadingPlaceholders; track placeholder) {
+          <article class="history-skeleton glass-card" aria-hidden="true">
+            <span class="history-skeleton__line history-skeleton__line--short"></span>
+            <span class="history-skeleton__line"></span>
+            <span class="history-skeleton__line history-skeleton__line--medium"></span>
+            <span class="history-skeleton__line history-skeleton__line--footer"></span>
+          </article>
+        }
+      </div>
+    </section>
+  } @else if (loadError(); as errorMessage) {
+    <section class="history-feedback history-feedback--error glass-panel" role="alert">
+      <div class="history-feedback__icon" aria-hidden="true">
+        <mat-icon>cloud_off</mat-icon>
+      </div>
+      <div>
+        <p class="eyebrow">Histórico indisponível</p>
+        <h2>Não foi possível carregar o histórico</h2>
+        <p>{{ errorMessage }}</p>
+        <button matButton="filled" type="button" (click)="retryLoad()">
+          <mat-icon>refresh</mat-icon>
+          Tentar novamente
+        </button>
+      </div>
+    </section>
+  } @else if (isEmpty()) {
+    <section class="history-feedback glass-panel" aria-labelledby="history-empty-title">
+      <div class="history-feedback__icon" aria-hidden="true">
+        <mat-icon>{{ isFiltered() ? 'search_off' : 'history_toggle_off' }}</mat-icon>
+      </div>
+      <div>
+        <p class="eyebrow">{{ isFiltered() ? 'Nenhum resultado' : 'Tudo tranquilo' }}</p>
+        <h2 id="history-empty-title">
+          {{ isFiltered() ? 'Nenhum resultado encontrado' : 'Nenhuma notificação ainda' }}
+        </h2>
+        <p>
+          @if (isFiltered()) {
+            Não existem notificações que correspondam aos filtros atuais.
+          } @else {
+            As notificações enviadas pelo LazyDeploy aparecerão aqui.
+          }
+        </p>
+        @if (isFiltered()) {
+          <button matButton="filled" type="button" (click)="clearFilters()">
+            <mat-icon>filter_alt_off</mat-icon>
+            Limpar filtros
+          </button>
+        }
+      </div>
+    </section>
+  } @else {
+    <section class="history-results" aria-labelledby="history-results-title">
+      <div class="history-results__heading">
+        <div>
+          <p class="eyebrow">Registros persistidos</p>
+          <h2 id="history-results-title">Tentativas recentes</h2>
+        </div>
+        <span>{{ totalElements() }} registro{{ totalElements() === 1 ? '' : 's' }}</span>
+      </div>
+
+      <div class="history-list">
+        @for (item of items(); track item.id) {
+          <app-notification-history-item [item]="item" />
+        }
+      </div>
+
+      <nav class="history-pagination glass-panel" aria-label="Paginação do histórico">
+        <button
+          matButton="outlined"
+          type="button"
+          [disabled]="!hasPreviousPage() || loading()"
+          (click)="goToPreviousPage()"
+        >
+          <mat-icon>chevron_left</mat-icon>
+          Anterior
+        </button>
+        <span aria-live="polite">{{ pageLabel() }}</span>
+        <button
+          matButton="outlined"
+          type="button"
+          [disabled]="!hasNextPage() || loading()"
+          (click)="goToNextPage()"
+        >
+          Próxima
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </nav>
+    </section>
+  }
+</section>

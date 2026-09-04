@@ -15,6 +15,7 @@ import { MapCatalogService } from '../../data-access/map-catalog.service';
 import { BattlefieldMap } from '../../models/battlefield-map.model';
 import { SubscriptionService } from '../../../dashboard/data-access/subscription.service';
 import { SubscriptionSummary } from '../../../dashboard/models/subscription-summary.model';
+import { NotificationHistoryService } from '../../../history/data-access/notification-history.service';
 
 describe('AlertDetailsPageComponent', () => {
   let fixture: ComponentFixture<AlertDetailsPageComponent>;
@@ -25,6 +26,7 @@ describe('AlertDetailsPageComponent', () => {
     delete: ReturnType<typeof vi.fn>;
   };
   let mapCatalogMock: { list: ReturnType<typeof vi.fn> };
+  let notificationHistoryMock: { listBySubscription: ReturnType<typeof vi.fn> };
   let dialogMock: { open: ReturnType<typeof vi.fn> };
   let snackBarMock: { open: ReturnType<typeof vi.fn> };
   let router: Router;
@@ -38,6 +40,19 @@ describe('AlertDetailsPageComponent', () => {
     };
     mapCatalogMock = {
       list: vi.fn(() => of(createMapCatalog())),
+    };
+    notificationHistoryMock = {
+      listBySubscription: vi.fn(() =>
+        of({
+          content: [],
+          page: 0,
+          size: 5,
+          totalElements: 0,
+          totalPages: 0,
+          first: true,
+          last: true,
+        }),
+      ),
     };
     dialogMock = {
       open: vi.fn(() => ({ afterClosed: () => of(false) })),
@@ -57,6 +72,7 @@ describe('AlertDetailsPageComponent', () => {
         { provide: ActivatedRoute, useValue: { paramMap: routeParameters.asObservable() } },
         { provide: AuthService, useValue: { currentUser } },
         { provide: MapCatalogService, useValue: mapCatalogMock },
+        { provide: NotificationHistoryService, useValue: notificationHistoryMock },
         { provide: SubscriptionService, useValue: subscriptionServiceMock },
         { provide: MatDialog, useValue: dialogMock },
         { provide: MatSnackBar, useValue: snackBarMock },
@@ -84,6 +100,31 @@ describe('AlertDetailsPageComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Ativo');
     expect(fixture.nativeElement.textContent).toContain('Operation Locker');
     expect(fixture.nativeElement.textContent).toContain('player@example.com');
+    expect(notificationHistoryMock.listBySubscription).toHaveBeenCalledWith('subscription-1', {
+      page: 0,
+      size: 5,
+    });
+  });
+
+  it('should render the current server status returned by the subscription detail', () => {
+    subscriptionServiceMock.getById.mockReturnValue(
+      of(createSubscription({ currentStatus: availableStatus() })),
+    );
+
+    createFixture();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Operation Locker');
+    expect(text).toContain('54 / 64 jogadores');
+    expect(text).toContain('Conquest Large');
+  });
+
+  it('should render unavailable current status without replacing detail content', () => {
+    createFixture();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Aguardando primeira observação do servidor.');
+    expect(text).toContain('Servidor de teste');
   });
 
   it('should reload when the route id changes', () => {
@@ -92,6 +133,49 @@ describe('AlertDetailsPageComponent', () => {
     fixture.detectChanges();
 
     expect(subscriptionServiceMock.getById).toHaveBeenNthCalledWith(2, 'subscription-2');
+  });
+
+  it('should load at most five recent notifications independently', () => {
+    const recentNotifications = [
+      createHistoryItem('notification-1'),
+      createHistoryItem('notification-2'),
+      createHistoryItem('notification-3'),
+      createHistoryItem('notification-4'),
+      createHistoryItem('notification-5'),
+      createHistoryItem('notification-6'),
+    ];
+    notificationHistoryMock.listBySubscription.mockReturnValue(
+      of({
+        content: recentNotifications,
+        page: 0,
+        size: 5,
+        totalElements: 6,
+        totalPages: 2,
+        first: true,
+        last: false,
+      }),
+    );
+
+    createFixture();
+
+    expect(notificationHistoryMock.listBySubscription).toHaveBeenCalledWith('subscription-1', {
+      page: 0,
+      size: 5,
+    });
+    expect(fixture.nativeElement.querySelectorAll('app-notification-history-item')).toHaveLength(5);
+  });
+
+  it('should keep subscription details available when recent history fails', () => {
+    notificationHistoryMock.listBySubscription.mockReturnValue(
+      throwError(() => ({ status: 500, code: 'INTERNAL_ERROR' })),
+    );
+
+    createFixture();
+
+    expect(fixture.nativeElement.textContent).toContain('Servidor de teste');
+    expect(fixture.nativeElement.textContent).toContain(
+      'Não foi possível carregar as notificações recentes.',
+    );
   });
 
   it('should render the not found state for a 404 response', () => {
@@ -204,8 +288,33 @@ function createSubscription(overrides: Partial<SubscriptionSummary> = {}): Subsc
         enabled: true,
       },
     ],
+    currentStatus: unavailableStatus(),
     ...overrides,
   };
+}
+
+function unavailableStatus() {
+  return {
+    available: false,
+    availabilityReason: 'NOT_OBSERVED_YET',
+    map: null,
+    players: null,
+    gameMode: null,
+    lastObservedAt: null,
+    capturedAt: null,
+  } as const;
+}
+
+function availableStatus() {
+  return {
+    available: true,
+    availabilityReason: null,
+    map: { id: 'MP_Prison', displayName: 'Operation Locker' },
+    players: { current: 54, max: 64 },
+    gameMode: 'ConquestLarge0',
+    lastObservedAt: '2026-09-02T23:44:54Z',
+    capturedAt: '2026-09-02T23:44:54Z',
+  } as const;
 }
 
 function createMapCatalog(): BattlefieldMap[] {
@@ -217,4 +326,20 @@ function createMapCatalog(): BattlefieldMap[] {
       expansion: null,
     },
   ];
+}
+
+function createHistoryItem(id: string) {
+  return {
+    id,
+    subscriptionId: 'subscription-1',
+    server: { id: 'server-1', displayName: 'Servidor de teste' },
+    roundInstanceId: 'round-1',
+    map: { id: 'MP_Prison', displayName: 'Operation Locker' },
+    players: { current: 50, maximum: 64 },
+    gameMode: 'Conquest Large',
+    channelType: 'EMAIL',
+    status: 'SUCCESS',
+    attemptedAt: '2026-09-02T12:00:00Z',
+    sentAt: '2026-09-02T12:00:02Z',
+  };
 }

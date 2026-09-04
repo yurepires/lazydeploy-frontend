@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   WritableSignal,
   computed,
@@ -12,8 +13,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, Subscription, catchError, exhaustMap, finalize, timer } from 'rxjs';
 
+import { DASHBOARD_STATUS_REFRESH_INTERVAL_MS } from '../../../../core/config/api-config';
 import { ApiErrorService } from '../../../../core/http/api-error.service';
 import { AlertCardComponent } from '../../components/alert-card/alert-card.component';
 import {
@@ -36,10 +39,13 @@ export class DashboardPageComponent implements OnInit {
   private readonly apiErrorService = inject(ApiErrorService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
+  private pollingSubscription: Subscription | null = null;
 
   readonly subscriptions = signal<SubscriptionSummary[]>([]);
   readonly loading = signal(false);
   readonly loadError = signal<string | null>(null);
+  readonly refreshError = signal<string | null>(null);
   readonly updatingIds = signal<Set<string>>(new Set());
   readonly deletingIds = signal<Set<string>>(new Set());
 
@@ -70,20 +76,61 @@ export class DashboardPageComponent implements OnInit {
   readonly loadingPlaceholders = [1, 2, 3];
 
   ngOnInit(): void {
+    this.destroyRef.onDestroy(() => this.stopPolling());
     this.loadSubscriptions();
   }
 
   loadSubscriptions(): void {
+    this.stopPolling();
     this.loading.set(true);
     this.loadError.set(null);
+    this.refreshError.set(null);
 
     this.subscriptionService
       .list()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (subscriptions) => this.subscriptions.set(subscriptions),
+        next: (subscriptions) => {
+          this.subscriptions.set(subscriptions);
+          this.startPolling();
+        },
         error: (error: unknown) => this.loadError.set(this.apiErrorService.messageFor(error)),
       });
+  }
+
+  private startPolling(): void {
+    if (this.pollingSubscription) {
+      return;
+    }
+
+    this.pollingSubscription = timer(
+      DASHBOARD_STATUS_REFRESH_INTERVAL_MS,
+      DASHBOARD_STATUS_REFRESH_INTERVAL_MS,
+    )
+      .pipe(
+        exhaustMap(() =>
+          this.subscriptionService.list().pipe(
+            catchError((error: unknown) => {
+              this.refreshError.set(this.apiErrorService.messageFor(error));
+              return EMPTY;
+            }),
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((subscriptions) => {
+        this.subscriptions.set(subscriptions);
+        this.refreshError.set(null);
+      });
+  }
+
+  private stopPolling(): void {
+    if (!this.pollingSubscription) {
+      return;
+    }
+
+    this.pollingSubscription.unsubscribe();
+    this.pollingSubscription = null;
   }
 
   isUpdating(subscriptionId: string): boolean {
@@ -107,7 +154,7 @@ export class DashboardPageComponent implements OnInit {
       .pipe(finalize(() => this.setOperationState(this.updatingIds, subscription.id, false)))
       .subscribe({
         next: (updatedSubscription) => {
-          this.replaceSubscription(updatedSubscription);
+          this.replaceSubscription(this.preserveCurrentStatus(updatedSubscription));
           this.showSuccess(this.toggleSuccessMessage(enabled));
         },
         error: (error: unknown) => this.showError(error),
@@ -166,6 +213,21 @@ export class DashboardPageComponent implements OnInit {
         subscription.id === updatedSubscription.id ? updatedSubscription : subscription,
       ),
     );
+  }
+
+  private preserveCurrentStatus(updatedSubscription: SubscriptionSummary): SubscriptionSummary {
+    const currentSubscription = this.subscriptions().find(
+      (subscription) => subscription.id === updatedSubscription.id,
+    );
+
+    if (!currentSubscription || updatedSubscription.currentStatus.available) {
+      return updatedSubscription;
+    }
+
+    return {
+      ...updatedSubscription,
+      currentStatus: currentSubscription.currentStatus,
+    };
   }
 
   private setOperationState(

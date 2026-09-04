@@ -25,6 +25,11 @@
     </span>
   </header>
 
+  <app-current-server-status
+    [status]="subscription().currentStatus"
+    [compact]="true"
+  />
+
   <div class="alert-card__content">
     <section class="alert-card__section" aria-labelledby="rules-title-{{ subscription().id }}">
       <div class="alert-card__section-heading">

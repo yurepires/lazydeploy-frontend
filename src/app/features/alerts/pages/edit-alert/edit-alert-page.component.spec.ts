@@ -220,8 +220,21 @@ function createSubscription(overrides: Partial<SubscriptionSummary> = {}): Subsc
       createRule('rule-2', 'PLAYER_COUNT_AT_LEAST', { value: 40 }),
     ],
     channels: [{ id: 'channel-1', type: 'EMAIL', enabled: true }],
+    currentStatus: unavailableStatus(),
     ...overrides,
   };
+}
+
+function unavailableStatus() {
+  return {
+    available: false,
+    availabilityReason: 'NOT_OBSERVED_YET',
+    map: null,
+    players: null,
+    gameMode: null,
+    lastObservedAt: null,
+    capturedAt: null,
+  } as const;
 }
 
 function createRule(id: string, type: string, parameters: Record<string, unknown>): RuleSummary {

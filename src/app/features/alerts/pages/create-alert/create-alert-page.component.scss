@@ -31,7 +31,16 @@
 }
 
 .back-link mat-icon {
+  display: inline-flex;
+  width: 1.1rem;
+  height: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
   font-size: 1.1rem;
+  line-height: 1;
+  text-align: center;
+  transform: translateY(1px);
 }
 
 .create-alert-page__header .eyebrow {

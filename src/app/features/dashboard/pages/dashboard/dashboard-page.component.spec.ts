@@ -141,6 +141,93 @@ describe('DashboardPageComponent', () => {
     expect(fixture.nativeElement.querySelector('app-alert-card')).toBeTruthy();
   });
 
+  it('should refresh the aggregated subscription list after the initial load', async () => {
+    vi.useFakeTimers();
+    try {
+      const initialSubscription = createSubscription();
+      const refreshedSubscription = createSubscription({
+        currentStatus: availableStatus(),
+      });
+      let requestCount = 0;
+      subscriptionServiceMock.list.mockImplementation(() => {
+        requestCount += 1;
+        return of(requestCount === 1 ? [initialSubscription] : [refreshedSubscription]);
+      });
+
+      createFixture();
+      expect(requestCount).toBe(1);
+
+      await vi.advanceTimersByTimeAsync(20_000);
+
+      expect(requestCount).toBe(2);
+      expect(fixture.componentInstance.subscriptions()).toEqual([refreshedSubscription]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('should stop polling when the Dashboard is destroyed', async () => {
+    vi.useFakeTimers();
+    try {
+      subscriptionServiceMock.list.mockReturnValue(of([createSubscription()]));
+      createFixture();
+      fixture.destroy();
+
+      await vi.advanceTimersByTimeAsync(20_000);
+
+      expect(subscriptionServiceMock.list).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('should keep previous data when a background refresh fails', async () => {
+    vi.useFakeTimers();
+    try {
+      const subscription = createSubscription();
+      subscriptionServiceMock.list
+        .mockReturnValueOnce(of([subscription]))
+        .mockReturnValueOnce(throwError(() => ({ status: 500, code: 'INTERNAL_ERROR' })));
+
+      createFixture();
+      await vi.advanceTimersByTimeAsync(20_000);
+
+      expect(fixture.componentInstance.subscriptions()).toEqual([subscription]);
+      expect(fixture.componentInstance.loadError()).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('should not overlap background refresh requests', async () => {
+    vi.useFakeTimers();
+    try {
+      const pendingRefresh = new Subject<SubscriptionSummary[]>();
+      let requestCount = 0;
+      subscriptionServiceMock.list.mockImplementation(() => {
+        requestCount += 1;
+        if (requestCount === 1) {
+          return of([createSubscription()]);
+        }
+
+        return pendingRefresh.asObservable();
+      });
+
+      createFixture();
+      await vi.advanceTimersByTimeAsync(40_000);
+
+      expect(requestCount).toBe(2);
+
+      pendingRefresh.next([createSubscription({ currentStatus: availableStatus() })]);
+      pendingRefresh.complete();
+      await vi.advanceTimersByTimeAsync(20_000);
+
+      expect(requestCount).toBe(3);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('should update a subscription after a successful toggle', () => {
     const subscription = createSubscription({ enabled: true });
     const updatedSubscription = createSubscription({ enabled: false });
@@ -255,6 +342,31 @@ function createSubscription(overrides: Partial<SubscriptionSummary> = {}): Subsc
     },
     rules: [],
     channels: [],
+    currentStatus: unavailableStatus(),
     ...overrides,
   };
+}
+
+function unavailableStatus() {
+  return {
+    available: false,
+    availabilityReason: 'NOT_OBSERVED_YET',
+    map: null,
+    players: null,
+    gameMode: null,
+    lastObservedAt: null,
+    capturedAt: null,
+  } as const;
+}
+
+function availableStatus() {
+  return {
+    available: true,
+    availabilityReason: null,
+    map: { id: 'MP_Prison', displayName: 'Operation Locker' },
+    players: { current: 54, max: 64 },
+    gameMode: 'ConquestLarge0',
+    lastObservedAt: '2026-09-02T23:44:54Z',
+    capturedAt: '2026-09-02T23:44:54Z',
+  } as const;
 }

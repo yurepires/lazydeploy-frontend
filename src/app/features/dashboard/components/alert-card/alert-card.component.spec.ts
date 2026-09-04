@@ -63,6 +63,24 @@ describe('AlertCardComponent', () => {
     expect(text).toContain('Email');
   });
 
+  it('should render the available current server status separately from alert state', () => {
+    createCard(createSubscription({ currentStatus: availableStatus() }));
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Operation Locker');
+    expect(text).toContain('54 / 64 jogadores');
+    expect(text).toContain('Conquest Large');
+    expect(text).toContain('Ativo');
+  });
+
+  it('should render an unavailable current server status without hiding the alert', () => {
+    createCard(createSubscription({ currentStatus: unavailableStatus() }));
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Aguardando primeira observação do servidor.');
+    expect(text).toContain('Ativo');
+  });
+
   it('should emit toggle and delete events', () => {
     createCard();
     let toggleEmitted = false;
@@ -116,8 +134,33 @@ function createSubscription(overrides: Partial<SubscriptionSummary> = {}): Subsc
     },
     rules: [],
     channels: [],
+    currentStatus: unavailableStatus(),
     ...overrides,
   };
+}
+
+function unavailableStatus() {
+  return {
+    available: false,
+    availabilityReason: 'NOT_OBSERVED_YET',
+    map: null,
+    players: null,
+    gameMode: null,
+    lastObservedAt: null,
+    capturedAt: null,
+  } as const;
+}
+
+function availableStatus() {
+  return {
+    available: true,
+    availabilityReason: null,
+    map: { id: 'MP_Prison', displayName: 'Operation Locker' },
+    players: { current: 54, max: 64 },
+    gameMode: 'ConquestLarge0',
+    lastObservedAt: '2026-09-02T23:44:54Z',
+    capturedAt: '2026-09-02T23:44:54Z',
+  } as const;
 }
 
 function createRule(type: string, parameters: Record<string, unknown>): RuleSummary {

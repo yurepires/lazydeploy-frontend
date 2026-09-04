@@ -164,9 +164,22 @@ function createSubscription(overrides: Partial<SubscriptionSummary> = {}): Subsc
       id: 'server-1',
       guid: 'server-guid-1',
       displayName: 'Servidor de teste',
-    },
-    rules: [],
-    channels: [],
-    ...overrides,
-  };
+      },
+      rules: [],
+      channels: [],
+      currentStatus: unavailableStatus(),
+      ...overrides,
+    };
+}
+
+function unavailableStatus() {
+  return {
+    available: false,
+    availabilityReason: 'NOT_OBSERVED_YET',
+    map: null,
+    players: null,
+    gameMode: null,
+    lastObservedAt: null,
+    capturedAt: null,
+  } as const;
 }

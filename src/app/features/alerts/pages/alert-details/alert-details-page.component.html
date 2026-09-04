@@ -110,6 +110,10 @@
     </header>
 
     <div class="alert-details-page__sections">
+      <app-current-server-status
+        [status]="currentSubscription.currentStatus"
+        [compact]="false"
+      />
       <app-alert-overview [subscription]="currentSubscription" />
       <app-alert-conditions [rules]="currentSubscription.rules" [maps]="maps()" />
       <app-alert-notification-channels
@@ -117,15 +121,56 @@
         [accountEmail]="accountEmail()"
       />
 
-      <section class="history-placeholder glass-panel" aria-labelledby="history-placeholder-title">
-        <div class="history-placeholder__icon" aria-hidden="true">
-          <mat-icon>history</mat-icon>
-        </div>
-        <div>
-          <p class="eyebrow">Em breve</p>
-          <h2 id="history-placeholder-title">Últimas notificações</h2>
-          <p>O histórico deste alerta será exibido aqui.</p>
-        </div>
+      <section class="history-section glass-panel" aria-labelledby="history-section-title">
+        <header class="history-section__header">
+          <div class="history-section__title">
+            <div class="history-section__icon" aria-hidden="true">
+              <mat-icon>history</mat-icon>
+            </div>
+            <div>
+              <p class="eyebrow">Atividade recente</p>
+              <h2 id="history-section-title">Últimas notificações</h2>
+            </div>
+          </div>
+          <a
+            matButton="text"
+            [routerLink]="['/history']"
+            [queryParams]="{ subscriptionId: currentSubscription.id }"
+          >
+            Ver histórico completo
+            <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </header>
+
+        @if (recentNotificationsLoading()) {
+          <div
+            class="history-section__loading"
+            aria-busy="true"
+            aria-label="Carregando notificações recentes"
+          >
+            <mat-progress-spinner diameter="26" mode="indeterminate" />
+            <span>Carregando notificações recentes...</span>
+          </div>
+        } @else if (recentNotificationsError(); as errorMessage) {
+          <div class="history-section__message history-section__message--error" role="status">
+            <mat-icon aria-hidden="true">cloud_off</mat-icon>
+            <div>
+              <strong>Não foi possível carregar as notificações recentes.</strong>
+              <p>{{ errorMessage }}</p>
+            </div>
+          </div>
+        } @else if (recentNotifications().length === 0) {
+          <div class="history-section__message" role="status">
+            <mat-icon aria-hidden="true">history_toggle_off</mat-icon>
+            <p>Nenhuma notificação registrada para este alerta.</p>
+          </div>
+        } @else {
+          <div class="history-section__list">
+            @for (notification of recentNotifications(); track notification.id) {
+              <app-notification-history-item [item]="notification" />
+            }
+          </div>
+        }
       </section>
     </div>
   }

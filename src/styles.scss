@@ -207,3 +207,17 @@ a {
   white-space: nowrap;
   border: 0;
 }
+
+/* The Material form-field internals need a global rule for compact mobile sizing. */
+@media (max-width: 640px) {
+  .history-filters__field .mat-mdc-text-field-wrapper,
+  .history-filters__field .mdc-text-field--outlined {
+    height: 44px;
+  }
+
+  .history-filters__field .mat-mdc-form-field-infix {
+    min-height: 44px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}

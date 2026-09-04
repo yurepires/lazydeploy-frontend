@@ -3,6 +3,7 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 
+import { CurrentServerStatusComponent } from '../../../../shared/components/current-server-status/current-server-status.component';
 import { SubscriptionSummary } from '../../models/subscription-summary.model';
 import {
   ChannelPresentation,
@@ -14,7 +15,7 @@ import {
 @Component({
   selector: 'app-alert-card',
   standalone: true,
-  imports: [MatButton, MatIcon, MatIconButton, RouterLink],
+  imports: [CurrentServerStatusComponent, MatButton, MatIcon, MatIconButton, RouterLink],
   templateUrl: './alert-card.component.html',
   styleUrl: './alert-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

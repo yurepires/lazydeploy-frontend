@@ -10,6 +10,8 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BrandMarkComponent } from '../../shared/components/brand-mark/brand-mark.component';
 import { AuthService } from '../auth/auth.service';
 
+const SIDENAV_OVERLAY_BREAKPOINT = '(max-width: 905px)';
+
 @Component({
   selector: 'app-shell',
   standalone: true,
@@ -31,7 +33,7 @@ import { AuthService } from '../auth/auth.service';
 export class AppShellComponent {
   private readonly breakpointObserver = inject(BreakpointObserver);
   readonly authService = inject(AuthService);
-  private readonly viewport = toSignal(this.breakpointObserver.observe('(max-width: 760px)'), {
+  private readonly viewport = toSignal(this.breakpointObserver.observe(SIDENAV_OVERLAY_BREAKPOINT), {
     initialValue: { matches: false, breakpoints: {} },
   });
 

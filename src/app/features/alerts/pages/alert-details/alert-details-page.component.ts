@@ -31,6 +31,10 @@ import { ApiErrorService } from '../../../../core/http/api-error.service';
 import { AlertConditionsComponent } from '../../components/alert-conditions/alert-conditions.component';
 import { AlertNotificationChannelsComponent } from '../../components/alert-notification-channels/alert-notification-channels.component';
 import { AlertOverviewComponent } from '../../components/alert-overview/alert-overview.component';
+import { CurrentServerStatusComponent } from '../../../../shared/components/current-server-status/current-server-status.component';
+import { NotificationHistoryItemComponent } from '../../../history/components/notification-history-item/notification-history-item.component';
+import { NotificationHistoryService } from '../../../history/data-access/notification-history.service';
+import { NotificationHistoryItem } from '../../../history/models/notification-history-item.model';
 import {
   DeleteAlertDialogComponent,
   DeleteAlertDialogData,
@@ -47,6 +51,10 @@ type LoadResult =
   | { readonly type: 'error'; readonly message: string }
   | { readonly type: 'invalid-id' };
 
+type RecentLoadResult =
+  | { readonly type: 'success'; readonly notifications: NotificationHistoryItem[] }
+  | { readonly type: 'error'; readonly message: string };
+
 @Component({
   selector: 'app-alert-details-page',
   standalone: true,
@@ -54,9 +62,11 @@ type LoadResult =
     AlertConditionsComponent,
     AlertNotificationChannelsComponent,
     AlertOverviewComponent,
+    CurrentServerStatusComponent,
     MatButton,
     MatIcon,
     MatProgressSpinner,
+    NotificationHistoryItemComponent,
     RouterLink,
   ],
   templateUrl: './alert-details-page.component.html',
@@ -73,8 +83,10 @@ export class AlertDetailsPageComponent implements OnInit {
   private readonly subscriptionService = inject(SubscriptionService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly notificationHistoryService = inject(NotificationHistoryService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly loadRequests = new Subject<string | null>();
+  private readonly recentNotificationRequests = new Subject<string>();
 
   readonly subscription = signal<SubscriptionSummary | null>(null);
   readonly loading = signal(false);
@@ -85,6 +97,9 @@ export class AlertDetailsPageComponent implements OnInit {
   readonly maps = signal<BattlefieldMap[]>([]);
   readonly currentSubscriptionId = signal<string | null>(null);
   readonly mapsLoading = signal(false);
+  readonly recentNotifications = signal<NotificationHistoryItem[]>([]);
+  readonly recentNotificationsLoading = signal(false);
+  readonly recentNotificationsError = signal<string | null>(null);
 
   private readonly mapsLoaded = signal(false);
 
@@ -127,6 +142,7 @@ export class AlertDetailsPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.listenForLoadRequests();
+    this.listenForRecentNotificationRequests();
     this.listenForRouteChanges();
   }
 
@@ -159,8 +175,9 @@ export class AlertDetailsPageComponent implements OnInit {
       )
       .subscribe({
         next: (updatedSubscription) => {
-          this.subscription.set(updatedSubscription);
-          this.updatePageTitle(updatedSubscription);
+          const subscriptionWithCurrentStatus = this.preserveCurrentStatus(updatedSubscription);
+          this.subscription.set(subscriptionWithCurrentStatus);
+          this.updatePageTitle(subscriptionWithCurrentStatus);
           this.showSuccess(this.toggleSuccessMessage(enabled));
         },
         error: (error: unknown) => this.showError(error),
@@ -258,16 +275,19 @@ export class AlertDetailsPageComponent implements OnInit {
         this.loadError.set(null);
         this.updatePageTitle(result.subscription);
         this.loadMapCatalogIfNeeded(result.subscription);
+        this.loadRecentNotifications(result.subscription.id);
         return;
       case 'not-found':
       case 'invalid-id':
         this.subscription.set(null);
+        this.clearRecentNotifications();
         this.notFound.set(true);
         this.loadError.set(null);
         this.title.setTitle('LazyDeploy | Alerta');
         return;
       case 'error':
         this.subscription.set(null);
+        this.clearRecentNotifications();
         this.notFound.set(false);
         this.loadError.set(result.message);
         this.title.setTitle('LazyDeploy | Alerta');
@@ -281,6 +301,59 @@ export class AlertDetailsPageComponent implements OnInit {
     this.loadError.set(null);
     this.notFound.set(false);
     this.title.setTitle('LazyDeploy | Alerta');
+    this.clearRecentNotifications();
+  }
+
+  private loadRecentNotifications(subscriptionId: string): void {
+    this.recentNotificationRequests.next(subscriptionId);
+  }
+
+  private listenForRecentNotificationRequests(): void {
+    this.recentNotificationRequests
+      .pipe(
+        switchMap((subscriptionId) => this.fetchRecentNotifications(subscriptionId)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((result) => {
+        if (result.type === 'success') {
+          this.recentNotifications.set(result.notifications);
+          this.recentNotificationsError.set(null);
+          return;
+        }
+
+        this.recentNotifications.set([]);
+        this.recentNotificationsError.set(result.message);
+      });
+  }
+
+  private fetchRecentNotifications(subscriptionId: string): Observable<RecentLoadResult> {
+    this.recentNotificationsLoading.set(true);
+    this.recentNotificationsError.set(null);
+
+    return this.notificationHistoryService
+      .listBySubscription(subscriptionId, {
+        page: 0,
+        size: 5,
+      })
+      .pipe(
+        map((response): RecentLoadResult => ({
+          type: 'success',
+          notifications: response.content.slice(0, 5),
+        })),
+        catchError((error: unknown) =>
+          of<RecentLoadResult>({
+            type: 'error',
+            message: this.apiErrorService.messageFor(error),
+          }),
+        ),
+        finalize(() => this.recentNotificationsLoading.set(false)),
+      );
+  }
+
+  private clearRecentNotifications(): void {
+    this.recentNotifications.set([]);
+    this.recentNotificationsLoading.set(false);
+    this.recentNotificationsError.set(null);
   }
 
   private loadMapCatalogIfNeeded(currentSubscription: SubscriptionSummary): void {
@@ -331,6 +404,19 @@ export class AlertDetailsPageComponent implements OnInit {
 
   private updatePageTitle(currentSubscription: SubscriptionSummary): void {
     this.title.setTitle(`LazyDeploy | ${currentSubscription.server.displayName}`);
+  }
+
+  private preserveCurrentStatus(updatedSubscription: SubscriptionSummary): SubscriptionSummary {
+    const currentSubscription = this.subscription();
+
+    if (!currentSubscription || updatedSubscription.currentStatus.available) {
+      return updatedSubscription;
+    }
+
+    return {
+      ...updatedSubscription,
+      currentStatus: currentSubscription.currentStatus,
+    };
   }
 
   private toggleSuccessMessage(enabled: boolean): string {

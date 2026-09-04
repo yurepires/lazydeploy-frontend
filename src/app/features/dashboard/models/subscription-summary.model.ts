@@ -1,3 +1,5 @@
+import { CurrentServerStatus } from '../../../shared/models/current-server-status.model';
+
 export interface SubscriptionSummary {
   readonly id: string;
   readonly enabled: boolean;
@@ -6,6 +8,7 @@ export interface SubscriptionSummary {
   readonly server: ServerSummary;
   readonly rules: RuleSummary[];
   readonly channels: ChannelSummary[];
+  readonly currentStatus: CurrentServerStatus;
 }
 
 export interface ServerSummary {

@@ -1,0 +1,56 @@
+<section
+  class="current-server-status"
+  [class.current-server-status--compact]="compact()"
+  [class.current-server-status--full]="!compact()"
+  aria-label="Estado atual do servidor"
+>
+  @if (status().available) {
+    <div class="current-server-status__items">
+      @if (mapDisplayName(); as mapName) {
+        <div class="current-server-status__item current-server-status__item--map">
+          <mat-icon aria-hidden="true">map</mat-icon>
+          <div>
+            <span class="current-server-status__label">Mapa atual</span>
+            <strong>{{ mapName }}</strong>
+          </div>
+        </div>
+      }
+
+      @if (playersLabel(); as players) {
+        <div class="current-server-status__item">
+          <mat-icon aria-hidden="true">groups</mat-icon>
+          <div>
+            <span class="current-server-status__label">Jogadores</span>
+            <strong>{{ players }}</strong>
+          </div>
+        </div>
+      }
+
+      @if (presentedGameMode(); as gameMode) {
+        <div class="current-server-status__item">
+          <mat-icon aria-hidden="true">sports_esports</mat-icon>
+          <div>
+            <span class="current-server-status__label">Modo de jogo</span>
+            <strong>{{ gameMode }}</strong>
+          </div>
+        </div>
+      }
+
+      <div class="current-server-status__item current-server-status__item--observed">
+        <mat-icon aria-hidden="true">schedule</mat-icon>
+        <div>
+          <span class="current-server-status__label">Última observação</span>
+          <strong>{{ lastObservedLabel() }}</strong>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="current-server-status__unavailable" role="status">
+      <mat-icon aria-hidden="true">hourglass_empty</mat-icon>
+      <div>
+        <span class="current-server-status__label">Estado atual</span>
+        <strong>{{ unavailableMessage() }}</strong>
+      </div>
+    </div>
+  }
+</section>

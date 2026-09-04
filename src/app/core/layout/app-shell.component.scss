@@ -44,6 +44,20 @@
   z-index: 1;
 }
 
+.topbar.glass-panel,
+.navigation.glass-panel {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 36%),
+    linear-gradient(145deg, rgba(29, 45, 68, 0.58), rgba(13, 25, 41, 0.36));
+  background-color: transparent;
+}
+
+.shell-content.mat-drawer-container,
+.shell-main.mat-drawer-content {
+  background: transparent;
+  background-color: transparent;
+}
+
 .topbar {
   display: flex;
   width: calc(100% - 2rem);
@@ -109,8 +123,28 @@
 }
 
 .topbar__logout {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   margin-left: 0.2rem;
   color: var(--text-secondary);
+}
+
+.topbar__logout > mat-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: inline-flex;
+  width: 1.5rem;
+  height: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  line-height: 1;
+  text-align: center;
+  transform: translate(-50%, -50%);
 }
 
 .shell-content {
@@ -123,6 +157,8 @@
 
 .navigation {
   width: 16.5rem;
+  height: min(42rem, calc(100dvh - 7.5rem));
+  max-height: calc(100dvh - 7.5rem);
   padding: var(--space-lg) var(--space-sm);
   border-radius: var(--radius-lg);
 }
@@ -159,9 +195,18 @@
   transition: 160ms ease;
 }
 
-.navigation__link mat-icon {
+.navigation__link > mat-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 1.2rem;
+  height: 1.2rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
   color: var(--text-muted);
   font-size: 1.2rem;
+  line-height: 1;
+  text-align: center;
 }
 
 .navigation__link:hover,
@@ -194,8 +239,16 @@
   color: var(--color-primary);
 }
 
-.navigation__footer-icon mat-icon {
+.navigation__footer-icon > mat-icon {
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
   font-size: 1rem;
+  line-height: 1;
+  text-align: center;
 }
 
 .navigation__footer strong,
@@ -227,7 +280,7 @@
   padding: var(--space-md) var(--space-lg) var(--space-xl);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 905px) {
   .topbar {
     width: calc(100% - 1rem);
     margin-top: var(--space-sm);
@@ -258,6 +311,6 @@
   }
 
   .shell-main__inner {
-    padding: var(--space-sm) 0 var(--space-lg);
+    padding: var(--space-sm) var(--space-sm) var(--space-lg);
   }
 }

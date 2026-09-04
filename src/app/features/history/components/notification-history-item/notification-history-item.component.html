@@ -1,0 +1,51 @@
+<article
+  class="history-item glass-card"
+  [class.history-item--failure]="status().tone === 'failure'"
+>
+  <div
+    class="history-item__status"
+    [class.history-item__status--success]="status().tone === 'success'"
+    [class.history-item__status--failure]="status().tone === 'failure'"
+    [class.history-item__status--unknown]="status().tone === 'unknown'"
+  >
+    <mat-icon aria-hidden="true">{{ status().icon }}</mat-icon>
+    <span>{{ status().label }}</span>
+  </div>
+
+  <div class="history-item__main">
+    <div class="history-item__map">
+      <p class="eyebrow">Mapa registrado</p>
+      <h3>{{ mapName() }}</h3>
+      @if (item().map.id && item().map.id !== item().map.displayName) {
+        <span>{{ item().map.id }}</span>
+      }
+    </div>
+
+    <div class="history-item__server">
+      <p class="eyebrow">Servidor</p>
+      <strong>{{ serverName() }}</strong>
+      <span>{{ players() }}</span>
+    </div>
+  </div>
+
+  <div class="history-item__meta">
+    <span>
+      <mat-icon aria-hidden="true">{{ channel().icon }}</mat-icon>
+      {{ channel().label }}
+    </span>
+    <span>
+      <mat-icon aria-hidden="true">sports_esports</mat-icon>
+      {{ gameMode() }}
+    </span>
+    <time [attr.datetime]="item().attemptedAt" [title]="item().attemptedAt">
+      <mat-icon aria-hidden="true">schedule</mat-icon>
+      {{ attemptedAt() }}
+    </time>
+    @if (item().sentAt) {
+      <span class="history-item__delivery">
+        <mat-icon aria-hidden="true">done_all</mat-icon>
+        Entregue {{ sentAt() }}
+      </span>
+    }
+  </div>
+</article>
