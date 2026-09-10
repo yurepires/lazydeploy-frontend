@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://api.lazydeploy.com',
+  apiBaseUrl: 'https://lazydeploy-backend-production.up.railway.app',
   apiPath: '/api',
 } as const;
