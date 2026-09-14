@@ -1,5 +1,8 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://lazydeploy-backend-production.up.railway.app',
+  // The production API is proxied by the Cloudflare Pages Function at /api.
+  // Keeping the browser on the frontend origin makes the session and CSRF
+  // cookies first-party, including on iOS browsers.
+  apiBaseUrl: '',
   apiPath: '/api',
 } as const;
