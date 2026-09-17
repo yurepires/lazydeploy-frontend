@@ -138,6 +138,69 @@ describe('AuthService', () => {
     resend.flush(null, { status: 202, statusText: 'Accepted' });
   });
 
+  it('requests, verifies, and completes password recovery without persisting the grant', () => {
+    service.requestPasswordRecovery({ email: 'player@example.com' }).subscribe();
+    const recoveryRequest = httpTesting.expectOne(
+      'http://localhost:8080/api/auth/password-recovery/request',
+    );
+    expect(recoveryRequest.request.body).toEqual({ email: 'player@example.com' });
+    recoveryRequest.flush(null, { status: 202, statusText: 'Accepted' });
+    expect(service.pendingPasswordRecoveryEmail()).toBe('player@example.com');
+
+    let resetToken: string | undefined;
+    service
+      .verifyPasswordRecovery({ email: 'player@example.com', code: '042731' })
+      .subscribe((response) => {
+        resetToken = response.resetToken;
+      });
+    const verification = httpTesting.expectOne(
+      'http://localhost:8080/api/auth/password-recovery/verify',
+    );
+    verification.flush({
+      resetToken: 'temporary-reset-token',
+      expiresAt: '2026-09-17T20:10:00Z',
+    });
+    expect(resetToken).toBe('temporary-reset-token');
+    expect(sessionStorage.getItem('temporary-reset-token')).toBeNull();
+
+    service
+      .completePasswordRecovery({
+        resetToken: 'temporary-reset-token',
+        newPassword: 'new-password-123',
+      })
+      .subscribe();
+    const completion = httpTesting.expectOne(
+      'http://localhost:8080/api/auth/password-recovery/complete',
+    );
+    completion.flush(null, { status: 204, statusText: 'No Content' });
+    expect(service.pendingPasswordRecoveryEmail()).toBeNull();
+  });
+
+  it('changes the authenticated password and clears the local user', () => {
+    service.login({ email: 'player@example.com', password: 'current-password' }).subscribe();
+    httpTesting.expectOne('http://localhost:8080/api/auth/login').flush({
+      id: 'user-1',
+      email: 'player@example.com',
+    });
+
+    service
+      .changePassword({
+        currentPassword: 'current-password',
+        newPassword: 'new-password-123',
+      })
+      .subscribe();
+    const request = httpTesting.expectOne('http://localhost:8080/api/auth/password');
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({
+      currentPassword: 'current-password',
+      newPassword: 'new-password-123',
+    });
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(service.currentUser()).toBeNull();
+    expect(service.authenticated()).toBe(false);
+  });
+
   it('logs out through the backend and clears the current user', () => {
     service.login({ email: 'player@example.com', password: 'secret-password' }).subscribe();
     httpTesting.expectOne('http://localhost:8080/api/auth/login').flush({

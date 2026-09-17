@@ -22,3 +22,27 @@ export interface ConfirmEmailVerificationRequest {
 export interface ResendEmailVerificationRequest {
   readonly email: string;
 }
+
+export interface ChangePasswordRequest {
+  readonly currentPassword: string;
+  readonly newPassword: string;
+}
+
+export interface RequestPasswordRecoveryRequest {
+  readonly email: string;
+}
+
+export interface VerifyPasswordRecoveryRequest {
+  readonly email: string;
+  readonly code: string;
+}
+
+export interface PasswordResetGrantResponse {
+  readonly resetToken: string;
+  readonly expiresAt: string;
+}
+
+export interface CompletePasswordRecoveryRequest {
+  readonly resetToken: string;
+  readonly newPassword: string;
+}

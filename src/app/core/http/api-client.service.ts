@@ -21,6 +21,10 @@ export class ApiClientService {
     return this.http.post<TResponse>(this.buildUrl(resourcePath), body);
   }
 
+  put<TResponse, TRequest>(resourcePath: string, body: TRequest): Observable<TResponse> {
+    return this.http.put<TResponse>(this.buildUrl(resourcePath), body);
+  }
+
   patch<TResponse, TRequest>(resourcePath: string, body: TRequest): Observable<TResponse> {
     return this.http.patch<TResponse>(this.buildUrl(resourcePath), body);
   }

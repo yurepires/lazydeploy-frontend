@@ -1,0 +1,123 @@
+<section class="account-page" aria-labelledby="account-title">
+  <header class="account-page__header">
+    <p class="eyebrow">Segurança</p>
+    <h1 id="account-title">Minha conta</h1>
+    <p>Gerencie seus dados de acesso e mantenha sua conta protegida.</p>
+  </header>
+
+  <div class="account-grid">
+    <article class="account-card glass-card">
+      <div class="account-card__icon" aria-hidden="true"><mat-icon>person</mat-icon></div>
+      <div>
+        <span class="account-card__label">Email da conta</span>
+        <strong>{{ authService.currentUser()?.email }}</strong>
+        <p>Este é o endereço utilizado para login e notificações.</p>
+      </div>
+    </article>
+
+    <article class="password-card glass-card">
+      <div class="password-card__heading">
+        <div class="password-card__icon" aria-hidden="true"><mat-icon>password</mat-icon></div>
+        <div>
+          <h2>Alterar senha</h2>
+          <p>Ao concluir, todas as sessões abertas serão encerradas.</p>
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <p class="account-message" role="alert">{{ errorMessage() }}</p>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Senha atual</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
+          <input
+            matInput
+            [type]="currentPasswordVisible() ? 'text' : 'password'"
+            autocomplete="current-password"
+            formControlName="currentPassword"
+          />
+          <button
+            matIconButton
+            matSuffix
+            type="button"
+            [attr.aria-label]="currentPasswordVisible() ? 'Ocultar senha' : 'Mostrar senha'"
+            (click)="toggleCurrentPasswordVisibility()"
+          >
+            <mat-icon>{{ currentPasswordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (currentPasswordControl.hasError('required')) {
+            <mat-error>Informe sua senha atual.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nova senha</mat-label>
+          <mat-icon matPrefix>key</mat-icon>
+          <input
+            matInput
+            [type]="newPasswordVisible() ? 'text' : 'password'"
+            autocomplete="new-password"
+            formControlName="newPassword"
+          />
+          <button
+            matIconButton
+            matSuffix
+            type="button"
+            [attr.aria-label]="newPasswordVisible() ? 'Ocultar senha' : 'Mostrar senha'"
+            (click)="toggleNewPasswordVisibility()"
+          >
+            <mat-icon>{{ newPasswordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (newPasswordControl.hasError('required')) {
+            <mat-error>Informe a nova senha.</mat-error>
+          } @else if (newPasswordControl.hasError('minlength')) {
+            <mat-error>A senha deve possuir pelo menos 8 caracteres.</mat-error>
+          } @else if (newPasswordControl.hasError('maxlength')) {
+            <mat-error>A senha deve possuir no máximo 128 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Confirme a nova senha</mat-label>
+          <mat-icon matPrefix>lock_reset</mat-icon>
+          <input
+            matInput
+            [type]="confirmPasswordVisible() ? 'text' : 'password'"
+            autocomplete="new-password"
+            formControlName="confirmPassword"
+          />
+          <button
+            matIconButton
+            matSuffix
+            type="button"
+            [attr.aria-label]="confirmPasswordVisible() ? 'Ocultar senha' : 'Mostrar senha'"
+            (click)="toggleConfirmPasswordVisibility()"
+          >
+            <mat-icon>{{ confirmPasswordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (confirmPasswordControl.hasError('required')) {
+            <mat-error>Confirme a nova senha.</mat-error>
+          }
+        </mat-form-field>
+
+        @if (shouldShowPasswordMismatch) {
+          <p class="password-mismatch" role="alert">As senhas não coincidem.</p>
+        }
+
+        <button matButton="filled" type="submit" [disabled]="submitting()">
+          <span class="password-card__button-content">
+            @if (submitting()) {
+              <mat-progress-spinner diameter="18" mode="indeterminate" />
+              <span>Alterando...</span>
+            } @else {
+              <mat-icon>security</mat-icon>
+              <span>Alterar senha</span>
+            }
+          </span>
+        </button>
+      </form>
+    </article>
+  </div>
+</section>

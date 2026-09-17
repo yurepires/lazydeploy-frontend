@@ -13,7 +13,16 @@ describe('application routes', () => {
     const routePaths = routes.map((route) => route.path);
     const workspaceRoute = routes.find((route) => route.component === AppShellComponent);
 
-    expect(routePaths).toEqual(expect.arrayContaining(['login', 'register', '**']));
+    expect(routePaths).toEqual(
+      expect.arrayContaining([
+        'login',
+        'register',
+        'verify-email',
+        'forgot-password',
+        'reset-password',
+        '**',
+      ]),
+    );
     expect(workspaceRoute?.children?.map((route) => route.path)).toEqual(
       expect.arrayContaining([
         'dashboard',
@@ -21,6 +30,7 @@ describe('application routes', () => {
         'alerts/:id',
         'alerts/:id/edit',
         'history',
+        'account',
       ]),
     );
   });

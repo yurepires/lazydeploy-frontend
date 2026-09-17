@@ -102,6 +102,12 @@
   color: var(--text-secondary);
   font-size: 0.76rem;
   line-height: 1.25rem;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.topbar__account-info:hover {
+  color: var(--text-primary);
 }
 
 .topbar__account-info mat-icon {

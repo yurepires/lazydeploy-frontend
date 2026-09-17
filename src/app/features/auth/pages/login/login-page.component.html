@@ -15,6 +15,18 @@
       </p>
     }
 
+    @if (passwordChanged()) {
+      <p class="auth-message auth-message--success" role="status">
+        Senha alterada. Todas as sessões foram encerradas; entre novamente para continuar.
+      </p>
+    }
+
+    @if (passwordReset()) {
+      <p class="auth-message auth-message--success" role="status">
+        Sua senha foi redefinida. Entre com a nova senha.
+      </p>
+    }
+
     @if (errorMessage()) {
       <p class="auth-message auth-message--error" role="alert">{{ errorMessage() }}</p>
     }
@@ -58,19 +70,23 @@
         }
       </mat-form-field>
 
+      <a class="forgot-password-link" routerLink="/forgot-password">Esqueci minha senha</a>
+
       <button
         class="auth-card__primary-action"
         matButton="filled"
         type="submit"
         [disabled]="submitting()"
       >
-        <mat-icon>{{ submitting() ? 'hourglass_top' : 'login' }}</mat-icon>
-        @if (submitting()) {
-          <mat-progress-spinner diameter="18" mode="indeterminate" />
-          Entrando...
-        } @else {
-          Entrar
-        }
+        <span class="auth-card__button-content">
+          @if (submitting()) {
+            <mat-progress-spinner diameter="18" mode="indeterminate" />
+            <span>Entrando...</span>
+          } @else {
+            <mat-icon>login</mat-icon>
+            <span>Entrar</span>
+          }
+        </span>
       </button>
     </form>
     <p class="auth-card__footer">

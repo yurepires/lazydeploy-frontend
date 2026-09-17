@@ -38,6 +38,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'forgot-password',
+    canActivate: [guestRouteGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/forgot-password/forgot-password-page.component').then(
+        ({ ForgotPasswordPageComponent }) => ForgotPasswordPageComponent,
+      ),
+  },
+  {
+    path: 'reset-password',
+    canActivate: [guestRouteGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/reset-password/reset-password-page.component').then(
+        ({ ResetPasswordPageComponent }) => ResetPasswordPageComponent,
+      ),
+  },
+  {
     path: '',
     component: AppShellComponent,
     children: [
@@ -80,6 +96,14 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/history/pages/history/history-page.component').then(
             ({ HistoryPageComponent }) => HistoryPageComponent,
+          ),
+      },
+      {
+        path: 'account',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/account/pages/account/account-page.component').then(
+            ({ AccountPageComponent }) => AccountPageComponent,
           ),
       },
     ],

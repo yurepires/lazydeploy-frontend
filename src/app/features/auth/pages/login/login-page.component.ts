@@ -53,6 +53,18 @@ export class LoginPageComponent {
     ),
     { initialValue: false },
   );
+  readonly passwordChanged = toSignal(
+    this.activatedRoute.queryParamMap.pipe(
+      map((queryParams) => queryParams.get('passwordChanged') === 'true'),
+    ),
+    { initialValue: false },
+  );
+  readonly passwordReset = toSignal(
+    this.activatedRoute.queryParamMap.pipe(
+      map((queryParams) => queryParams.get('passwordReset') === 'true'),
+    ),
+    { initialValue: false },
+  );
   readonly passwordVisible = signal(false);
 
   get emailControl() {

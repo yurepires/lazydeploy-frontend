@@ -14,6 +14,14 @@ const FRIENDLY_MESSAGES: Record<string, string> = {
     'O limite de tentativas foi atingido. Solicite um novo código.',
   VERIFICATION_EMAIL_DELIVERY_FAILED:
     'Não foi possível enviar o email de confirmação. Tente reenviar o código.',
+  CURRENT_PASSWORD_INVALID: 'A senha atual está incorreta.',
+  NEW_PASSWORD_MUST_DIFFER: 'A nova senha deve ser diferente da senha atual.',
+  PASSWORD_RESET_CODE_INVALID: 'O código de recuperação informado é inválido.',
+  PASSWORD_RESET_CODE_EXPIRED: 'O código expirou. Solicite um novo código.',
+  PASSWORD_RESET_CODE_ATTEMPTS_EXCEEDED:
+    'O limite de tentativas foi atingido. Solicite um novo código.',
+  PASSWORD_RESET_GRANT_INVALID: 'A autorização para alterar a senha não é mais válida.',
+  PASSWORD_RESET_GRANT_EXPIRED: 'A autorização expirou. Solicite um novo código.',
   VALIDATION_FAILED: 'Verifique os dados informados.',
   UNAUTHENTICATED: 'Sua sessão não está autenticada.',
   CSRF_VALIDATION_FAILED: 'Não foi possível validar a requisição. Tente novamente.',

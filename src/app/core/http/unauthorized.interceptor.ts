@@ -42,7 +42,15 @@ function shouldRedirectToLogin(
 
   const requestPath = request.url.split('?')[0];
 
-  return !['/auth/me', '/auth/login', '/auth/register', '/auth/logout'].some((path) =>
+  return ![
+    '/auth/me',
+    '/auth/login',
+    '/auth/register',
+    '/auth/logout',
+    '/auth/password-recovery/request',
+    '/auth/password-recovery/verify',
+    '/auth/password-recovery/complete',
+  ].some((path) =>
     requestPath.endsWith(path),
   );
 }

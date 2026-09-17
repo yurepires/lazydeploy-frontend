@@ -13,9 +13,15 @@ import {
   RegisterRequest,
   RegistrationResponse,
   ResendEmailVerificationRequest,
+  ChangePasswordRequest,
+  CompletePasswordRecoveryRequest,
+  PasswordResetGrantResponse,
+  RequestPasswordRecoveryRequest,
+  VerifyPasswordRecoveryRequest,
 } from './auth.models';
 
 const PENDING_VERIFICATION_EMAIL_KEY = 'lazydeploy.pending-verification-email';
+const PENDING_PASSWORD_RECOVERY_EMAIL_KEY = 'lazydeploy.pending-password-recovery-email';
 
 interface AuthenticatedUserResponse {
   readonly id: string;
@@ -105,6 +111,42 @@ export class AuthService {
       .pipe(catchError((error: unknown) => this.toApiProblem(error)));
   }
 
+  changePassword(request: ChangePasswordRequest): Observable<void> {
+    return this.apiClient.put<void, ChangePasswordRequest>('/auth/password', request).pipe(
+      tap(() => this.clearCurrentUser()),
+      catchError((error: unknown) => this.toApiProblem(error)),
+    );
+  }
+
+  requestPasswordRecovery(request: RequestPasswordRecoveryRequest): Observable<void> {
+    return this.apiClient
+      .post<void, RequestPasswordRecoveryRequest>('/auth/password-recovery/request', request)
+      .pipe(
+        tap(() => this.rememberPendingPasswordRecoveryEmail(request.email)),
+        catchError((error: unknown) => this.toApiProblem(error)),
+      );
+  }
+
+  verifyPasswordRecovery(
+    request: VerifyPasswordRecoveryRequest,
+  ): Observable<PasswordResetGrantResponse> {
+    return this.apiClient
+      .post<PasswordResetGrantResponse, VerifyPasswordRecoveryRequest>(
+        '/auth/password-recovery/verify',
+        request,
+      )
+      .pipe(catchError((error: unknown) => this.toApiProblem(error)));
+  }
+
+  completePasswordRecovery(request: CompletePasswordRecoveryRequest): Observable<void> {
+    return this.apiClient
+      .post<void, CompletePasswordRecoveryRequest>('/auth/password-recovery/complete', request)
+      .pipe(
+        tap(() => this.clearPendingPasswordRecoveryEmail()),
+        catchError((error: unknown) => this.toApiProblem(error)),
+      );
+  }
+
   rememberPendingVerificationEmail(email: string): void {
     sessionStorage.setItem(PENDING_VERIFICATION_EMAIL_KEY, email.trim().toLowerCase());
   }
@@ -115,6 +157,18 @@ export class AuthService {
 
   clearPendingVerificationEmail(): void {
     sessionStorage.removeItem(PENDING_VERIFICATION_EMAIL_KEY);
+  }
+
+  rememberPendingPasswordRecoveryEmail(email: string): void {
+    sessionStorage.setItem(PENDING_PASSWORD_RECOVERY_EMAIL_KEY, email.trim().toLowerCase());
+  }
+
+  pendingPasswordRecoveryEmail(): string | null {
+    return sessionStorage.getItem(PENDING_PASSWORD_RECOVERY_EMAIL_KEY);
+  }
+
+  clearPendingPasswordRecoveryEmail(): void {
+    sessionStorage.removeItem(PENDING_PASSWORD_RECOVERY_EMAIL_KEY);
   }
 
   logout(): Observable<void> {
