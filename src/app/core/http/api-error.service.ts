@@ -6,6 +6,14 @@ import { ApiProblemDetail } from './api-problem-detail.model';
 const FRIENDLY_MESSAGES: Record<string, string> = {
   INVALID_CREDENTIALS: 'Email ou senha inválidos.',
   EMAIL_ALREADY_REGISTERED: 'Já existe uma conta cadastrada com este email.',
+  EMAIL_VERIFICATION_PENDING: 'Este email ainda está aguardando confirmação.',
+  EMAIL_NOT_VERIFIED: 'Confirme seu email antes de entrar.',
+  EMAIL_VERIFICATION_CODE_INVALID: 'O código informado é inválido.',
+  EMAIL_VERIFICATION_CODE_EXPIRED: 'O código expirou. Solicite um novo código.',
+  EMAIL_VERIFICATION_CODE_ATTEMPTS_EXCEEDED:
+    'O limite de tentativas foi atingido. Solicite um novo código.',
+  VERIFICATION_EMAIL_DELIVERY_FAILED:
+    'Não foi possível enviar o email de confirmação. Tente reenviar o código.',
   VALIDATION_FAILED: 'Verifique os dados informados.',
   UNAUTHENTICATED: 'Sua sessão não está autenticada.',
   CSRF_VALIDATION_FAILED: 'Não foi possível validar a requisição. Tente novamente.',

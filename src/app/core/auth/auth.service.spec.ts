@@ -13,6 +13,9 @@ describe('AuthService', () => {
   let httpTesting: HttpTestingController;
 
   beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
@@ -35,6 +38,8 @@ describe('AuthService', () => {
 
   afterEach(() => {
     httpTesting.verify();
+    localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('loads the current user and updates the authentication state', () => {
@@ -103,9 +108,34 @@ describe('AuthService', () => {
       password: 'secret-password',
     });
 
-    request.flush({ id: 'user-2', email: 'new-player@example.com' });
+    request.flush({
+      email: 'new-player@example.com',
+      verificationRequired: true,
+      verificationExpiresAt: '2026-09-17T20:10:00Z',
+    });
 
     expect(service.currentUser()).toBeNull();
+    expect(service.pendingVerificationEmail()).toBe('new-player@example.com');
+  });
+
+  it('confirms and resends email verification codes', () => {
+    service.confirmEmail({ email: 'player@example.com', code: '042731' }).subscribe();
+
+    const confirmation = httpTesting.expectOne(
+      'http://localhost:8080/api/auth/email-verification/confirm',
+    );
+    expect(confirmation.request.body).toEqual({
+      email: 'player@example.com',
+      code: '042731',
+    });
+    confirmation.flush(null, { status: 204, statusText: 'No Content' });
+
+    service.resendEmailVerification({ email: 'player@example.com' }).subscribe();
+    const resend = httpTesting.expectOne(
+      'http://localhost:8080/api/auth/email-verification/resend',
+    );
+    expect(resend.request.body).toEqual({ email: 'player@example.com' });
+    resend.flush(null, { status: 202, statusText: 'Accepted' });
   });
 
   it('logs out through the backend and clears the current user', () => {

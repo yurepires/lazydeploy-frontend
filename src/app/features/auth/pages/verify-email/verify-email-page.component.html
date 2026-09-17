@@ -1,0 +1,105 @@
+<main class="auth-page">
+  <div class="auth-page__glow auth-page__glow--top" aria-hidden="true"></div>
+  <div class="auth-page__glow auth-page__glow--bottom" aria-hidden="true"></div>
+  <section class="auth-card glass-dialog" aria-labelledby="verify-email-title">
+    <app-brand-mark />
+    @if (confirmed()) {
+      <p class="eyebrow">Email confirmado</p>
+      <h1 id="verify-email-title">Cadastro concluído</h1>
+      <p class="auth-card__description">
+        Seu email foi verificado. Agora você pode entrar e criar seus alertas.
+      </p>
+      <a
+        class="auth-card__primary-action verification-login"
+        matButton="filled"
+        routerLink="/login"
+      >
+        <mat-icon>login</mat-icon> Ir para o login
+      </a>
+    } @else {
+      <p class="eyebrow">Confirme seu cadastro</p>
+      <h1 id="verify-email-title">Verifique seu email</h1>
+      @if (pendingEmail) {
+        <div class="verification-instructions">
+          <p>Um código de seis dígitos foi enviado para o seu email:</p>
+          <strong>{{ pendingEmail }}</strong>
+          <p>O código é válido por 10 minutos. Verifique também a caixa de spam.</p>
+        </div>
+      } @else {
+        <p class="auth-message auth-message--error" role="alert">
+          Não encontramos um cadastro pendente neste navegador. Volte ao cadastro para solicitar um
+          novo código.
+        </p>
+      }
+      @if (successMessage()) {
+        <p class="auth-message auth-message--success" role="status">{{ successMessage() }}</p>
+      }
+      @if (errorMessage()) {
+        <p class="auth-message auth-message--error" role="alert">{{ errorMessage() }}</p>
+      }
+      <form class="auth-form" [formGroup]="form" (ngSubmit)="confirm()" novalidate>
+        <div
+          class="verification-code"
+          role="group"
+          aria-labelledby="verification-code-label"
+          (paste)="handlePaste($event)"
+        >
+          <span id="verification-code-label" class="verification-code__label">
+            Código de verificação
+          </span>
+          <div class="verification-code__boxes">
+            @for (digit of codeDigits(); track $index) {
+              <input
+                #codeInput
+                class="verification-code__box"
+                type="text"
+                inputmode="numeric"
+                [attr.autocomplete]="$index === 0 ? 'one-time-code' : 'off'"
+                maxlength="1"
+                [attr.aria-label]="'Dígito ' + ($index + 1) + ' de 6'"
+                [value]="digit"
+                [disabled]="!pendingEmail || confirming()"
+                (input)="updateDigit($index, $event)"
+                (keydown)="handleKeydown($index, $event)"
+              />
+            }
+          </div>
+          @if (codeControl.touched && codeControl.invalid) {
+            <span class="verification-code__error" role="alert">
+              Informe os seis dígitos do código.
+            </span>
+          }
+        </div>
+        <button
+          class="auth-card__primary-action"
+          matButton="filled"
+          type="submit"
+          [disabled]="!pendingEmail || confirming()"
+        >
+          @if (confirming()) {
+            <mat-progress-spinner diameter="18" mode="indeterminate" />
+          } @else {
+            <mat-icon>verified</mat-icon>
+          }
+          <span>{{ confirming() ? 'Confirmando...' : 'Confirmar email' }}</span>
+        </button>
+      </form>
+      <button
+        class="verification-resend"
+        matButton
+        type="button"
+        [disabled]="!pendingEmail || resending() || resendCountdown() > 0"
+        (click)="resend()"
+      >
+        @if (resending()) {
+          Enviando novo código...
+        } @else if (resendCountdown() > 0) {
+          Reenviar código em {{ resendCountdown() }}s
+        } @else {
+          Reenviar código
+        }
+      </button>
+      <p class="auth-card__footer"><a routerLink="/login">Voltar ao login</a></p>
+    }
+  </section>
+</main>

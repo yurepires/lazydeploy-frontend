@@ -30,6 +30,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'verify-email',
+    canActivate: [guestRouteGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/verify-email/verify-email-page.component').then(
+        ({ VerifyEmailPageComponent }) => VerifyEmailPageComponent,
+      ),
+  },
+  {
     path: '',
     component: AppShellComponent,
     children: [

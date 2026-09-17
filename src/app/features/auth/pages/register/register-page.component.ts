@@ -97,12 +97,16 @@ export class RegisterPageComponent {
     this.authService.register({ email, password }).subscribe({
       next: () => {
         this.submitting.set(false);
-        void this.router.navigate(['/login'], {
-          queryParams: { registered: 'true' },
-        });
+        void this.router.navigate(['/verify-email']);
       },
       error: (error: ApiProblemDetail) => {
         this.submitting.set(false);
+        const errorCode = error.errorCode ?? error.code;
+        if (errorCode === 'EMAIL_VERIFICATION_PENDING') {
+          this.authService.rememberPendingVerificationEmail(email);
+          void this.router.navigate(['/verify-email']);
+          return;
+        }
         this.errorMessage.set(this.apiErrorService.messageFor(error));
         this.fieldErrors.set({
           email: this.apiErrorService.fieldMessageFor(error, 'email') ?? '',

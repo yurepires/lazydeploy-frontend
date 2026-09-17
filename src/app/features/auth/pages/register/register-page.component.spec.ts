@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { API_CONFIG } from '../../../../core/config/api-config';
 import { RegisterPageComponent } from './register-page.component';
@@ -12,10 +13,14 @@ class TestRouteComponent {}
 
 describe('RegisterPageComponent', () => {
   beforeEach(async () => {
+    sessionStorage.clear();
     await TestBed.configureTestingModule({
       imports: [RegisterPageComponent],
       providers: [
-        provideRouter([{ path: 'login', component: TestRouteComponent }]),
+        provideRouter([
+          { path: 'login', component: TestRouteComponent },
+          { path: 'verify-email', component: TestRouteComponent },
+        ]),
         provideHttpClient(),
         provideHttpClientTesting(),
         {
@@ -58,12 +63,20 @@ describe('RegisterPageComponent', () => {
       password: 'secret-password',
     });
     request.flush(
-      { id: 'user-2', email: 'new-player@example.com' },
+      {
+        email: 'new-player@example.com',
+        verificationRequired: true,
+        verificationExpiresAt: '2026-09-17T20:10:00Z',
+      },
       { status: 201, statusText: 'Created' },
     );
 
     await fixture.whenStable();
     expect(component.errorMessage()).toBeNull();
+    expect(TestBed.inject(Router).url).toBe('/verify-email');
+    expect(sessionStorage.getItem('lazydeploy.pending-verification-email')).toBe(
+      'new-player@example.com',
+    );
     httpTesting.verify();
   });
 

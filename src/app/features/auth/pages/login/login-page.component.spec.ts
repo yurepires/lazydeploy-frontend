@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 
 import { API_CONFIG } from '../../../../core/config/api-config';
 import { LoginPageComponent } from './login-page.component';
@@ -12,12 +12,14 @@ class TestRouteComponent {}
 
 describe('LoginPageComponent', () => {
   beforeEach(async () => {
+    sessionStorage.clear();
     await TestBed.configureTestingModule({
       imports: [LoginPageComponent],
       providers: [
         provideRouter([
           { path: 'dashboard', component: TestRouteComponent },
           { path: 'register', component: TestRouteComponent },
+          { path: 'verify-email', component: TestRouteComponent },
         ]),
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -74,6 +76,25 @@ describe('LoginPageComponent', () => {
     );
 
     expect(component.errorMessage()).toBe('Email ou senha inválidos.');
+    httpTesting.verify();
+  });
+
+  it('redirects an unverified account to the verification page', async () => {
+    const fixture = TestBed.createComponent(LoginPageComponent);
+    const component = fixture.componentInstance;
+    const httpTesting = TestBed.inject(HttpTestingController);
+
+    component.form.setValue({ email: 'player@example.com', password: 'secret-password' });
+    component.submit();
+
+    const request = httpTesting.expectOne('http://localhost:8080/api/auth/login');
+    request.flush({ errorCode: 'EMAIL_NOT_VERIFIED' }, { status: 403, statusText: 'Forbidden' });
+
+    await fixture.whenStable();
+    expect(TestBed.inject(Router).url).toBe('/verify-email');
+    expect(sessionStorage.getItem('lazydeploy.pending-verification-email')).toBe(
+      'player@example.com',
+    );
     httpTesting.verify();
   });
 

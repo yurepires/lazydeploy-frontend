@@ -89,6 +89,12 @@ export class LoginPageComponent {
       },
       error: (error: ApiProblemDetail) => {
         this.submitting.set(false);
+        const errorCode = error.errorCode ?? error.code;
+        if (errorCode === 'EMAIL_NOT_VERIFIED') {
+          this.authService.rememberPendingVerificationEmail(this.form.controls.email.value);
+          void this.router.navigate(['/verify-email']);
+          return;
+        }
         this.errorMessage.set(this.apiErrorService.messageFor(error));
         this.fieldErrors.set({
           email: this.apiErrorService.fieldMessageFor(error, 'email') ?? '',

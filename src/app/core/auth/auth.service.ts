@@ -7,7 +7,15 @@ import { ApiErrorService } from '../http/api-error.service';
 import { ApiProblemDetail } from '../http/api-problem-detail.model';
 import { CurrentUser } from '../../shared/models/current-user.model';
 
-import { LoginRequest, RegisterRequest } from './auth.models';
+import {
+  ConfirmEmailVerificationRequest,
+  LoginRequest,
+  RegisterRequest,
+  RegistrationResponse,
+  ResendEmailVerificationRequest,
+} from './auth.models';
+
+const PENDING_VERIFICATION_EMAIL_KEY = 'lazydeploy.pending-verification-email';
 
 interface AuthenticatedUserResponse {
   readonly id: string;
@@ -66,22 +74,47 @@ export class AuthService {
       .pipe(
         map((response) => this.toCurrentUser(response)),
         tap((user) => this.currentUserSignal.set(user)),
+        tap(() => this.clearPendingVerificationEmail()),
         tap(() => this.initializedSignal.set(true)),
         catchError((error: unknown) => this.toApiProblem(error)),
         finalize(() => this.loadingSignal.set(false)),
       );
   }
 
-  register(request: RegisterRequest): Observable<CurrentUser> {
+  register(request: RegisterRequest): Observable<RegistrationResponse> {
     this.loadingSignal.set(true);
 
     return this.apiClient
-      .post<AuthenticatedUserResponse, RegisterRequest>('/auth/register', request)
+      .post<RegistrationResponse, RegisterRequest>('/auth/register', request)
       .pipe(
-        map((response) => this.toCurrentUser(response)),
+        tap((response) => this.rememberPendingVerificationEmail(response.email)),
         catchError((error: unknown) => this.toApiProblem(error)),
         finalize(() => this.loadingSignal.set(false)),
       );
+  }
+
+  confirmEmail(request: ConfirmEmailVerificationRequest): Observable<void> {
+    return this.apiClient
+      .post<void, ConfirmEmailVerificationRequest>('/auth/email-verification/confirm', request)
+      .pipe(catchError((error: unknown) => this.toApiProblem(error)));
+  }
+
+  resendEmailVerification(request: ResendEmailVerificationRequest): Observable<void> {
+    return this.apiClient
+      .post<void, ResendEmailVerificationRequest>('/auth/email-verification/resend', request)
+      .pipe(catchError((error: unknown) => this.toApiProblem(error)));
+  }
+
+  rememberPendingVerificationEmail(email: string): void {
+    sessionStorage.setItem(PENDING_VERIFICATION_EMAIL_KEY, email.trim().toLowerCase());
+  }
+
+  pendingVerificationEmail(): string | null {
+    return sessionStorage.getItem(PENDING_VERIFICATION_EMAIL_KEY);
+  }
+
+  clearPendingVerificationEmail(): void {
+    sessionStorage.removeItem(PENDING_VERIFICATION_EMAIL_KEY);
   }
 
   logout(): Observable<void> {
