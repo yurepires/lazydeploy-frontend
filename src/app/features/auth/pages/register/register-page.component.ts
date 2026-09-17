@@ -69,6 +69,12 @@ export class RegisterPageComponent {
     return this.form.controls.confirmPassword;
   }
 
+  get shouldShowPasswordMismatch(): boolean {
+    const confirmationWasEdited =
+      this.confirmPasswordControl.dirty || this.confirmPasswordControl.touched;
+    return confirmationWasEdited && this.form.hasError('passwordMismatch');
+  }
+
   togglePasswordVisibility(): void {
     this.passwordVisible.update((visible) => !visible);
   }

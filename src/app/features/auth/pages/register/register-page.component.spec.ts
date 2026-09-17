@@ -41,8 +41,18 @@ describe('RegisterPageComponent', () => {
       confirmPassword: 'different-password',
     });
     component.submit();
+    fixture.detectChanges();
 
     expect(component.form.hasError('passwordMismatch')).toBe(true);
+    expect(component.shouldShowPasswordMismatch).toBe(true);
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[role="alert"]')?.textContent,
+    ).toContain('As senhas precisam ser iguais.');
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+        'button[type="submit"]',
+      )?.disabled,
+    ).toBe(true);
   });
 
   it('does not send confirmPassword to the backend', async () => {

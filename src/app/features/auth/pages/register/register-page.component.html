@@ -77,16 +77,18 @@
         </button>
         @if (confirmPasswordControl.hasError('required')) {
           <mat-error>Confirme sua senha.</mat-error>
-        } @else if (form.hasError('passwordMismatch')) {
-          <mat-error>As senhas precisam ser iguais.</mat-error>
         }
       </mat-form-field>
+
+      @if (shouldShowPasswordMismatch) {
+        <p class="password-mismatch-error" role="alert">As senhas precisam ser iguais.</p>
+      }
 
       <button
         class="auth-card__primary-action"
         matButton="filled"
         type="submit"
-        [disabled]="submitting()"
+        [disabled]="form.invalid || submitting()"
       >
         <mat-icon>{{ submitting() ? 'hourglass_top' : 'person_add' }}</mat-icon>
         @if (submitting()) {
