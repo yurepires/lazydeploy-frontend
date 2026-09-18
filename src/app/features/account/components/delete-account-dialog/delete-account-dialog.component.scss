@@ -1,0 +1,79 @@
+:host {
+  display: block;
+  min-width: min(100%, 30rem);
+}
+
+.dialog-description {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+form {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: var(--space-lg);
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-icon[matprefix] {
+  margin-right: 0.45rem;
+  color: var(--text-muted);
+}
+
+.dialog-message {
+  margin: var(--space-md) 0 0;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(255, 128, 128, 0.34);
+  border-radius: var(--radius-md);
+  background: rgba(255, 128, 128, 0.08);
+  color: #ffb3b3;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.delete-account-button {
+  background: var(--color-danger) !important;
+  color: #210b0b !important;
+}
+
+.delete-account-button__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  line-height: 1;
+}
+
+.delete-account-button__content mat-icon {
+  display: inline-flex;
+  width: 1.1rem;
+  height: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.1rem;
+  transform: translateY(1px);
+}
+
+.delete-account-button__content mat-progress-spinner {
+  display: inline-flex;
+}
+
+@media (max-width: 560px) {
+  :host {
+    min-width: 0;
+  }
+
+  mat-dialog-actions {
+    flex-wrap: wrap;
+  }
+
+  mat-dialog-actions button {
+    flex: 1 1 100%;
+  }
+}

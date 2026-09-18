@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
@@ -16,6 +17,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ApiErrorService } from '../../../../core/http/api-error.service';
 import { ApiProblemDetail } from '../../../../core/http/api-problem-detail.model';
+import { DeleteAccountDialogComponent } from '../../components/delete-account-dialog/delete-account-dialog.component';
 
 @Component({
   selector: 'app-account-page',
@@ -39,6 +41,7 @@ export class AccountPageComponent {
   readonly authService = inject(AuthService);
   private readonly apiErrorService = inject(ApiErrorService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
 
   readonly form = this.formBuilder.nonNullable.group(
     {
@@ -103,6 +106,20 @@ export class AccountPageComponent {
 
   toggleConfirmPasswordVisibility(): void {
     this.confirmPasswordVisible.update((visible) => !visible);
+  }
+
+  openDeleteAccountDialog(): void {
+    const dialogRef = this.dialog.open(DeleteAccountDialogComponent, {
+      width: 'min(100% - 2rem, 34rem)',
+      maxWidth: '34rem',
+      autoFocus: false,
+    });
+
+    dialogRef.afterClosed().subscribe((deleted) => {
+      if (deleted === true) {
+        void this.router.navigate(['/login'], { queryParams: { accountDeleted: 'true' } });
+      }
+    });
   }
 }
 

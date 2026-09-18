@@ -120,4 +120,28 @@
       </form>
     </article>
   </div>
+
+  <article class="account-danger-zone glass-card">
+    <div class="account-danger-zone__icon" aria-hidden="true">
+      <mat-icon>delete_forever</mat-icon>
+    </div>
+    <div class="account-danger-zone__content">
+      <h2>Zona de perigo</h2>
+      <p>
+        Excluir sua conta remove permanentemente suas subscriptions, configurações e histórico de
+        notificações. Essa ação não pode ser desfeita.
+      </p>
+    </div>
+    <button
+      matButton="outlined"
+      class="account-danger-zone__action"
+      type="button"
+      (click)="openDeleteAccountDialog()"
+    >
+      <span class="account-danger-zone__action-content">
+        <mat-icon>delete_outline</mat-icon>
+        <span>Excluir minha conta</span>
+      </span>
+    </button>
+  </article>
 </section>

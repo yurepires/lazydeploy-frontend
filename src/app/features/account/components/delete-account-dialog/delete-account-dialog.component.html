@@ -1,0 +1,60 @@
+<h2 mat-dialog-title>Excluir minha conta?</h2>
+
+<mat-dialog-content>
+  <p class="dialog-description">
+    Esta ação é permanente. Suas subscriptions, configurações, histórico de notificações e dados de
+    acesso serão excluídos imediatamente.
+  </p>
+  @if (errorMessage()) {
+    <p class="dialog-message" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <form id="delete-account-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <mat-form-field appearance="outline">
+      <mat-label>Senha atual</mat-label>
+      <mat-icon matPrefix>lock</mat-icon>
+      <input
+        matInput
+        [type]="passwordVisible() ? 'text' : 'password'"
+        autocomplete="current-password"
+        formControlName="currentPassword"
+      />
+      <button
+        matIconButton
+        matSuffix
+        type="button"
+        [attr.aria-label]="passwordVisible() ? 'Ocultar senha' : 'Mostrar senha'"
+        (click)="togglePasswordVisibility()"
+      >
+        <mat-icon>{{ passwordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      @if (currentPasswordControl.hasError('required')) {
+        <mat-error>Informe sua senha atual.</mat-error>
+      }
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton type="button" [disabled]="submitting()" (click)="close()">Cancelar</button>
+  <button
+    matButton="filled"
+    class="delete-account-button"
+    type="submit"
+    form="delete-account-form"
+    [disabled]="form.invalid || submitting()"
+  >
+    @if (submitting()) {
+      <span class="delete-account-button__content">
+        <mat-progress-spinner diameter="18" mode="indeterminate" />
+        <span>Excluindo...</span>
+      </span>
+    } @else {
+      <span class="delete-account-button__content">
+        <mat-icon>delete_forever</mat-icon>
+        <span>Excluir conta permanentemente</span>
+      </span>
+    }
+  </button>
+</mat-dialog-actions>

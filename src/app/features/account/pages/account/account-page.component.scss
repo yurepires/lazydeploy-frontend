@@ -27,7 +27,8 @@
 }
 
 .account-card,
-.password-card {
+.password-card,
+.account-danger-zone {
   padding: var(--space-lg);
 }
 
@@ -139,6 +140,66 @@
   font-size: 0.82rem;
 }
 
+.account-danger-zone {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  border-color: rgba(255, 128, 128, 0.28);
+}
+
+.account-danger-zone__icon {
+  display: grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: rgba(255, 128, 128, 0.1);
+  color: var(--color-danger);
+}
+
+.account-danger-zone__content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.account-danger-zone__content h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.account-danger-zone__content p {
+  margin: 0.4rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.account-danger-zone__action {
+  flex: 0 0 auto;
+  color: var(--color-danger) !important;
+}
+
+.account-danger-zone__action-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  line-height: 1;
+}
+
+.account-danger-zone__action-content mat-icon {
+  display: inline-flex;
+  width: 1.1rem;
+  height: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.1rem;
+  transform: translateY(1px);
+}
+
 @media (max-width: 760px) {
   .account-page {
     padding-top: var(--space-md);
@@ -149,6 +210,15 @@
   }
 
   .password-card form > button {
+    width: 100%;
+  }
+
+  .account-danger-zone {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .account-danger-zone__action {
     width: 100%;
   }
 }

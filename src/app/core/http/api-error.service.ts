@@ -16,6 +16,8 @@ const FRIENDLY_MESSAGES: Record<string, string> = {
     'Não foi possível enviar o email de confirmação. Tente reenviar o código.',
   CURRENT_PASSWORD_INVALID: 'A senha atual está incorreta.',
   NEW_PASSWORD_MUST_DIFFER: 'A nova senha deve ser diferente da senha atual.',
+  LAST_ADMIN_ACCOUNT_CANNOT_BE_DELETED:
+    'O último administrador habilitado não pode excluir a própria conta.',
   PASSWORD_RESET_CODE_INVALID: 'O código de recuperação informado é inválido.',
   PASSWORD_RESET_CODE_EXPIRED: 'O código expirou. Solicite um novo código.',
   PASSWORD_RESET_CODE_ATTEMPTS_EXCEEDED:

@@ -65,6 +65,12 @@ export class LoginPageComponent {
     ),
     { initialValue: false },
   );
+  readonly accountDeleted = toSignal(
+    this.activatedRoute.queryParamMap.pipe(
+      map((queryParams) => queryParams.get('accountDeleted') === 'true'),
+    ),
+    { initialValue: false },
+  );
   readonly passwordVisible = signal(false);
 
   get emailControl() {

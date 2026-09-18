@@ -201,6 +201,32 @@ describe('AuthService', () => {
     expect(service.authenticated()).toBe(false);
   });
 
+  it('deletes the account and clears all local authentication state', () => {
+    service.login({ email: 'player@example.com', password: 'current-password' }).subscribe();
+    httpTesting.expectOne('http://localhost:8080/api/auth/login').flush({
+      id: 'user-1',
+      email: 'player@example.com',
+    });
+    service.rememberPendingVerificationEmail('pending@example.com');
+    service.rememberPendingPasswordRecoveryEmail('recovery@example.com');
+
+    service
+      .deleteAccount({ currentPassword: 'current-password' })
+      .subscribe();
+
+    const request = httpTesting.expectOne('http://localhost:8080/api/auth/account');
+    expect(request.request.method).toBe('DELETE');
+    expect(request.request.body).toEqual({
+      currentPassword: 'current-password',
+    });
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(service.currentUser()).toBeNull();
+    expect(service.authenticated()).toBe(false);
+    expect(service.pendingVerificationEmail()).toBeNull();
+    expect(service.pendingPasswordRecoveryEmail()).toBeNull();
+  });
+
   it('logs out through the backend and clears the current user', () => {
     service.login({ email: 'player@example.com', password: 'secret-password' }).subscribe();
     httpTesting.expectOne('http://localhost:8080/api/auth/login').flush({

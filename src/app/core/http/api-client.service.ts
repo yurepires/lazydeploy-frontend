@@ -29,8 +29,15 @@ export class ApiClientService {
     return this.http.patch<TResponse>(this.buildUrl(resourcePath), body);
   }
 
-  delete<TResponse>(resourcePath: string): Observable<TResponse> {
-    return this.http.delete<TResponse>(this.buildUrl(resourcePath));
+  delete<TResponse, TRequest = unknown>(
+    resourcePath: string,
+    body?: TRequest,
+  ): Observable<TResponse> {
+    if (body === undefined) {
+      return this.http.delete<TResponse>(this.buildUrl(resourcePath));
+    }
+
+    return this.http.delete<TResponse>(this.buildUrl(resourcePath), { body });
   }
 
   private buildUrl(resourcePath: string): string {

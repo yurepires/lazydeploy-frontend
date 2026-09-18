@@ -14,6 +14,7 @@ import {
   RegistrationResponse,
   ResendEmailVerificationRequest,
   ChangePasswordRequest,
+  DeleteAccountRequest,
   CompletePasswordRecoveryRequest,
   PasswordResetGrantResponse,
   RequestPasswordRecoveryRequest,
@@ -114,6 +115,17 @@ export class AuthService {
   changePassword(request: ChangePasswordRequest): Observable<void> {
     return this.apiClient.put<void, ChangePasswordRequest>('/auth/password', request).pipe(
       tap(() => this.clearCurrentUser()),
+      catchError((error: unknown) => this.toApiProblem(error)),
+    );
+  }
+
+  deleteAccount(request: DeleteAccountRequest): Observable<void> {
+    return this.apiClient.delete<void, DeleteAccountRequest>('/auth/account', request).pipe(
+      tap(() => {
+        this.clearCurrentUser();
+        this.clearPendingVerificationEmail();
+        this.clearPendingPasswordRecoveryEmail();
+      }),
       catchError((error: unknown) => this.toApiProblem(error)),
     );
   }

@@ -28,6 +28,10 @@ export interface ChangePasswordRequest {
   readonly newPassword: string;
 }
 
+export interface DeleteAccountRequest {
+  readonly currentPassword: string;
+}
+
 export interface RequestPasswordRecoveryRequest {
   readonly email: string;
 }

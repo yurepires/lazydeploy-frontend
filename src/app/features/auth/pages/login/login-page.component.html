@@ -27,6 +27,12 @@
       </p>
     }
 
+    @if (accountDeleted()) {
+      <p class="auth-message auth-message--success" role="status">
+        Sua conta e seus dados foram excluídos permanentemente.
+      </p>
+    }
+
     @if (errorMessage()) {
       <p class="auth-message auth-message--error" role="alert">{{ errorMessage() }}</p>
     }
