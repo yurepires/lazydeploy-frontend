@@ -1,0 +1,194 @@
+<main class="legal-page">
+  <div class="auth-page__glow auth-page__glow--top" aria-hidden="true"></div>
+  <div class="auth-page__glow auth-page__glow--bottom" aria-hidden="true"></div>
+
+  <article class="legal-card glass-dialog" aria-labelledby="legal-title">
+    <a class="legal-card__back-link" matButton routerLink="/login">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar ao login
+    </a>
+
+    <p class="eyebrow">LazyDeploy</p>
+    <h1 id="legal-title">{{ pageTitle }}</h1>
+    <p class="legal-card__updated">Última atualização: 21 de setembro de 2026</p>
+
+    @if (isPrivacyPolicy) {
+      <section>
+        <h2>1. Quem somos</h2>
+        <p>
+          O LazyDeploy é um serviço de monitoramento de servidores de Battlefield 4. Para esta
+          política, o responsável pelo tratamento dos dados pode ser contatado pelo email
+          <a href="mailto:imsoolazy.dev@gmail.com">imsoolazy.dev@gmail.com</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2>2. Dados tratados</h2>
+        <p>Podemos tratar as seguintes categorias de dados:</p>
+        <ul>
+          <li>Email e credenciais de acesso, armazenando somente o hash da senha;</li>
+          <li>Dados de sessão e tokens técnicos de segurança;</li>
+          <li>Subscriptions, regras, canais e preferências de notificação;</li>
+          <li>Histórico das notificações enviadas e informações do servidor monitorado;</li>
+          <li>Dados técnicos de segurança, como endereço IP e registros de requisições.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. Finalidades e bases legais</h2>
+        <p>
+          Usamos esses dados para criar e proteger contas, confirmar emails, monitorar servidores,
+          enviar notificações solicitadas, impedir abuso, cumprir obrigações legais e prestar
+          suporte. O tratamento se baseia, conforme o caso, na execução do serviço solicitado,
+          no cumprimento de obrigações legais e no legítimo interesse de segurança e prevenção a
+          fraudes.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Emails e serviços de terceiros</h2>
+        <p>
+          Usamos o Mailjet para entregar emails de verificação, recuperação de senha, segurança e
+          notificações. O provedor pode tratar os dados necessários à entrega conforme sua própria
+          política de privacidade. Não vendemos dados pessoais e não usamos emails para publicidade
+          de terceiros.
+        </p>
+      </section>
+
+      <section>
+        <h2>5. Cookies e armazenamento local</h2>
+        <p>
+          O serviço utiliza cookies estritamente necessários para sessão e proteção contra CSRF.
+          O frontend também pode guardar temporariamente um email pendente de verificação ou
+          recuperação no armazenamento da sessão do navegador. Esses dados não substituem a
+          autenticação do backend.
+        </p>
+      </section>
+
+      <section>
+        <h2>6. Retenção e exclusão</h2>
+        <p>
+          Mantemos os dados enquanto a conta estiver ativa ou enquanto forem necessários às
+          finalidades descritas. A exclusão da conta remove imediatamente os dados pessoais,
+          subscriptions, configurações e histórico associados, sem possibilidade de recuperação.
+          Registros técnicos podem ser mantidos pelo período necessário à segurança e ao cumprimento
+          de obrigações legais.
+        </p>
+      </section>
+
+      <section>
+        <h2>7. Seus direitos</h2>
+        <p>
+          Você pode solicitar confirmação do tratamento, acesso, correção, eliminação, informação
+          sobre compartilhamentos e outros direitos previstos na legislação aplicável pelo email
+          de contato. Podemos solicitar informações adicionais para confirmar a identidade do
+          solicitante.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Segurança</h2>
+        <p>
+          Aplicamos HTTPS, sessões protegidas, hashes de senha, proteção CSRF, rate limiting e
+          controles de autorização. Nenhum serviço conectado à internet é absolutamente livre de
+          riscos; incidentes relevantes serão tratados conforme a legislação aplicável.
+        </p>
+      </section>
+
+      <section>
+        <h2>9. Alterações</h2>
+        <p>
+          Esta política pode ser atualizada para refletir mudanças no serviço ou na legislação. A
+          data no início da página indica a versão vigente.
+        </p>
+      </section>
+    } @else {
+      <section>
+        <h2>1. Aceitação</h2>
+        <p>
+          Ao criar uma conta ou utilizar o LazyDeploy, você declara que leu e concorda com estes
+          termos. Se não concordar, não utilize o serviço.
+        </p>
+      </section>
+
+      <section>
+        <h2>2. Descrição do serviço</h2>
+        <p>
+          O LazyDeploy permite acompanhar servidores de Battlefield 4 e configurar alertas com
+          base em mapas e quantidade de jogadores. A disponibilidade dos dados depende de provedores
+          externos e o serviço não garante que uma notificação será entregue em todas as situações.
+        </p>
+      </section>
+
+      <section>
+        <h2>3. Conta e segurança</h2>
+        <p>
+          Você é responsável por fornecer um email que controle, manter a senha em sigilo e
+          comunicar qualquer uso não autorizado. A verificação de email é necessária para utilizar
+          a conta. Não compartilhe sua sessão nem tente contornar controles de segurança.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Uso permitido</h2>
+        <p>É proibido utilizar o serviço para:</p>
+        <ul>
+          <li>Praticar fraude, abuso, engenharia reversa maliciosa ou acesso não autorizado;</li>
+          <li>Sobrecarregar a aplicação, os provedores ou os serviços de email;</li>
+          <li>Violar leis, direitos de terceiros ou regras das plataformas integradas;</li>
+          <li>Automatizar requisições de forma a contornar rate limits ou controles de segurança.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>5. Notificações e provedores externos</h2>
+        <p>
+          Alertas dependem da disponibilidade, precisão e latência das fontes externas e do
+          provedor de email. O LazyDeploy não garante entrega, instantaneidade ou completude das
+          informações e não deve ser usado para decisões críticas.
+        </p>
+      </section>
+
+      <section>
+        <h2>6. Exclusão de conta</h2>
+        <p>
+          Você pode excluir a conta pela área “Minha conta”. A exclusão é imediata, física e
+          irreversível, removendo subscriptions, configurações, histórico e dados pessoais
+          associados. Servidores, mapas e demais dados compartilhados não são removidos.
+        </p>
+      </section>
+
+      <section>
+        <h2>7. Disponibilidade e responsabilidade</h2>
+        <p>
+          O serviço é fornecido conforme disponível. Podemos realizar manutenção, alterar recursos
+          ou interromper integrações externas. Na extensão permitida pela legislação, não nos
+          responsabilizamos por indisponibilidade de provedores, falhas de entrega ou perdas
+          decorrentes do uso inadequado da aplicação.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Propriedade intelectual</h2>
+        <p>
+          O código do projeto é distribuído conforme a licença publicada no repositório. Marcas,
+          nomes, imagens e conteúdos de terceiros permanecem sujeitos aos respectivos direitos.
+        </p>
+      </section>
+
+      <section>
+        <h2>9. Alterações e contato</h2>
+        <p>
+          Estes termos podem ser atualizados quando necessário. A versão vigente é identificada
+          pela data no início da página. Dúvidas podem ser encaminhadas para
+          <a href="mailto:imsoolazy.dev@gmail.com">imsoolazy.dev@gmail.com</a>.
+        </p>
+      </section>
+    }
+
+    <footer class="legal-card__footer">
+      <a routerLink="/privacy">Política de privacidade</a>
+      <a routerLink="/terms">Termos de uso</a>
+    </footer>
+  </article>
+</main>

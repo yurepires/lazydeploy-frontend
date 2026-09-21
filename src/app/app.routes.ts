@@ -54,6 +54,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'privacy',
+    loadComponent: () =>
+      import('./features/legal/pages/legal/legal-page.component').then(
+        ({ LegalPageComponent }) => LegalPageComponent,
+      ),
+    data: { document: 'privacy' },
+  },
+  {
+    path: 'terms',
+    loadComponent: () =>
+      import('./features/legal/pages/legal/legal-page.component').then(
+        ({ LegalPageComponent }) => LegalPageComponent,
+      ),
+    data: { document: 'terms' },
+  },
+  {
     path: '',
     component: AppShellComponent,
     children: [

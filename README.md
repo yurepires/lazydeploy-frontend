@@ -58,6 +58,7 @@ src/
 │   │   ├── auth/              # login e cadastro
 │   │   ├── dashboard/         # visão geral das subscriptions
 │   │   ├── history/           # histórico de notificações
+│   │   ├── legal/             # política de privacidade e termos de uso
 │   │   └── not-found/         # página 404
 │   └── shared/                # componentes e utilitários reutilizáveis
 ├── assets/                    # imagens, logos e background
@@ -162,9 +163,25 @@ do frontend, sem barra no final.
 | `/alerts/:id`      | Detalhes de um alerta         |
 | `/alerts/:id/edit` | Edição de um alerta           |
 | `/history`         | Histórico de notificações     |
+| `/privacy`         | Política de privacidade       |
+| `/terms`           | Termos de uso                 |
 
 As páginas protegidas utilizam guards de autenticação. O carregamento das
 features é feito sob demanda para reduzir o bundle inicial.
+
+## Documentos legais
+
+Os documentos públicos ficam disponíveis no frontend e no repositório:
+
+- [Política de privacidade](PRIVACY_POLICY.md)
+- [Termos de uso](TERMS_OF_USE.md)
+- [Licença MIT](LICENSE)
+
+As páginas /privacy e /terms também podem ser acessadas sem autenticação.
+Antes do lançamento, revise o responsável pelo tratamento, o email de contato,
+a jurisdição e os prazos de retenção para que correspondam à operação real do
+serviço. Esses documentos são uma base de projeto e não substituem revisão
+jurídica.
 
 ## Integração com a API
 
@@ -196,6 +213,24 @@ Nenhuma chave privada ou credencial do backend deve ser colocada no frontend.
   compatível com as políticas de privacidade do iOS.
 - **Design responsivo:** a interface se adapta a diferentes larguras sem
   depender de uma versão separada para dispositivos móveis.
+
+## Integração contínua
+
+O workflow [Frontend CI](.github/workflows/ci.yml) é executado em pull requests
+para a branch `main`, em pushes para essa branch e manualmente pelo GitHub.
+Ele utiliza Node.js 22, instala as dependências com `npm ci`, executa os testes
+e gera o bundle de produção.
+
+Para impedir que alterações com falha sejam incorporadas à `main`, configure
+um ruleset no GitHub para essa branch com:
+
+1. exigência de pull request antes do merge;
+2. status check obrigatório `Frontend tests and build`;
+3. bloqueio de force push e exclusão da branch;
+4. aplicação das regras aos administradores, sem bypass permanente.
+
+O check aparecerá para seleção depois que o workflow for executado pelo menos
+uma vez no GitHub.
 
 ## Estrutura de um fluxo de contribuição
 
